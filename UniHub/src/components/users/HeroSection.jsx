@@ -3,45 +3,45 @@ import { GraduationCap, Users, BookOpen } from 'lucide-react';
 
 const HeroSection = () => {
   return (
-    <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="text-white bg-gradient-to-r from-blue-500 to-purple-600">
+      <div className="px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-full">
-              <GraduationCap className="h-16 w-16 text-white" />
+            <div className="p-4 rounded-full bg-white/10 backdrop-blur-sm">
+              <GraduationCap className="w-16 h-16 text-white" />
             </div>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="mb-6 text-4xl font-bold leading-tight md:text-6xl">
             Metropolitan University
           </h1>
           
-          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="max-w-3xl mx-auto mb-8 text-xl leading-relaxed text-blue-100 md:text-2xl">
             Welcome to your comprehensive lecturer management portal. Streamline your teaching, 
             manage courses, and engage with students efficiently.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 transform hover:scale-105 transition-all duration-300">
-              <BookOpen className="h-12 w-12 text-blue-200 mb-4 mx-auto" />
-              <h3 className="text-lg font-semibold mb-2">Course Management</h3>
-              <p className="text-blue-100 text-sm">
+          <div className="grid grid-cols-1 gap-8 mt-12 md:grid-cols-3">
+            <div className="p-6 transition-all duration-300 transform bg-white/10 backdrop-blur-sm rounded-xl hover:scale-105">
+              <BookOpen className="w-12 h-12 mx-auto mb-4 text-blue-200" />
+              <h3 className="mb-2 text-lg font-semibold">Course Management</h3>
+              <p className="text-sm text-blue-100">
                 Organize assignments, resources, and track student progress
               </p>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 transform hover:scale-105 transition-all duration-300">
-              <Users className="h-12 w-12 text-blue-200 mb-4 mx-auto" />
-              <h3 className="text-lg font-semibold mb-2">Student Interaction</h3>
-              <p className="text-blue-100 text-sm">
+            <div className="p-6 transition-all duration-300 transform bg-white/10 backdrop-blur-sm rounded-xl hover:scale-105">
+              <Users className="w-12 h-12 mx-auto mb-4 text-blue-200" />
+              <h3 className="mb-2 text-lg font-semibold">Student Interaction</h3>
+              <p className="text-sm text-blue-100">
                 Handle queries, provide feedback, and communicate effectively
               </p>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 transform hover:scale-105 transition-all duration-300">
-              <GraduationCap className="h-12 w-12 text-blue-200 mb-4 mx-auto" />
-              <h3 className="text-lg font-semibold mb-2">Academic Excellence</h3>
-              <p className="text-blue-100 text-sm">
+            <div className="p-6 transition-all duration-300 transform bg-white/10 backdrop-blur-sm rounded-xl hover:scale-105">
+              <GraduationCap className="w-12 h-12 mx-auto mb-4 text-blue-200" />
+              <h3 className="mb-2 text-lg font-semibold">Academic Excellence</h3>
+              <p className="text-sm text-blue-100">
                 Foster learning with modern tools and streamlined processes
               </p>
             </div>
