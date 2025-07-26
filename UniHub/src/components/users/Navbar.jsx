@@ -80,9 +80,9 @@ const Navbar = () => {
                   <span>Home</span>
                 </Link>
                 <Link
-                  to="/login"
+                  to="/lecturer/login"
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                    isActivePath('/login') 
+                    isActivePath('/lecturer/login') 
                       ? 'bg-blue-100 text-blue-700 font-medium' 
                       : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                   }`}
@@ -148,10 +148,10 @@ const Navbar = () => {
                     <span>Home</span>
                   </Link>
                   <Link
-                    to="/login"
+                    to="/lecturer/login"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActivePath('/login') 
+                      isActivePath('/lecturer/login') 
                         ? 'bg-blue-100 text-blue-700 font-medium' 
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}

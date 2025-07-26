@@ -15,10 +15,10 @@ const Home = () => {
         {isLoggedIn ? (
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <div>
-              <Announcement />
+              <Calendar />
             </div>
             <div>
-              <Calendar />
+              <Announcement />
             </div>
           </div>
         ) : (

@@ -14,15 +14,18 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Login form submitted with:', { email, password, role });
     setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {
+      console.log('Calling login function...');
       login({ email, password }, role);
       setIsLoading(false);
+      console.log('Login completed, navigating...');
       // Navigate based on role
       if (role === 'lecturer') {
-        navigate('/lecturer/home');
+        navigate('/lecturer');
       } else {
         navigate('/student/dashboard');
       }
