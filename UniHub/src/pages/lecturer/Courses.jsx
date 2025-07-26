@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, Plus, MessageSquare, Star, FileText, BookMarked, Users, HelpCircle } from 'lucide-react';
-import Queries from '../components/users/Queries';
+import Queries from '../../components/users/Queries';
 
 const Courses = () => {
   const [activeTab, setActiveTab] = useState('announcements');
@@ -19,23 +19,23 @@ const Courses = () => {
       case 'announcements':
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Course Announcements</h3>
               <button 
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="w-4 h-4" />
                 <span>Add Announcement</span>
               </button>
             </div>
             
             {showForm && (
-              <div className="bg-gray-50 rounded-lg p-6 border">
-                <h4 className="font-medium text-gray-800 mb-4">Create New Announcement</h4>
+              <div className="p-6 border rounded-lg bg-gray-50">
+                <h4 className="mb-4 font-medium text-gray-800">Create New Announcement</h4>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Title</label>
                     <input 
                       type="text" 
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -43,7 +43,7 @@ const Courses = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Content</label>
                     <textarea 
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -51,12 +51,12 @@ const Courses = () => {
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <button className="px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
                       Publish
                     </button>
                     <button 
                       onClick={() => setShowForm(false)}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
                     >
                       Cancel
                     </button>
@@ -67,9 +67,9 @@ const Courses = () => {
             
             <div className="space-y-4">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="bg-white border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-800 mb-2">Week {item} Assignment Due</h4>
-                  <p className="text-gray-600 text-sm mb-2">Complete the programming exercises for Chapter {item}.</p>
+                <div key={item} className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <h4 className="mb-2 font-medium text-gray-800">Week {item} Assignment Due</h4>
+                  <p className="mb-2 text-sm text-gray-600">Complete the programming exercises for Chapter {item}.</p>
                   <span className="text-xs text-gray-500">Posted 2 days ago</span>
                 </div>
               ))}
@@ -80,24 +80,24 @@ const Courses = () => {
       case 'assignments':
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Assignments</h3>
               <button 
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="w-4 h-4" />
                 <span>Add Assignment</span>
               </button>
             </div>
             
             {showForm && (
-              <div className="bg-gray-50 rounded-lg p-6 border">
-                <h4 className="font-medium text-gray-800 mb-4">Create New Assignment</h4>
+              <div className="p-6 border rounded-lg bg-gray-50">
+                <h4 className="mb-4 font-medium text-gray-800">Create New Assignment</h4>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Title</label>
+                      <label className="block mb-2 text-sm font-medium text-gray-700">Assignment Title</label>
                       <input 
                         type="text" 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -105,7 +105,7 @@ const Courses = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                      <label className="block mb-2 text-sm font-medium text-gray-700">Due Date</label>
                       <input 
                         type="date" 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -113,7 +113,7 @@ const Courses = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Instructions</label>
                     <textarea 
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -121,12 +121,12 @@ const Courses = () => {
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <button className="px-4 py-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
                       Create Assignment
                     </button>
                     <button 
                       onClick={() => setShowForm(false)}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
                     >
                       Cancel
                     </button>
@@ -135,13 +135,13 @@ const Courses = () => {
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="bg-white border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-800 mb-2">Assignment {item}</h4>
-                  <p className="text-gray-600 text-sm mb-3">Due: Jan {15 + item}, 2024</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                <div key={item} className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <h4 className="mb-2 font-medium text-gray-800">Assignment {item}</h4>
+                  <p className="mb-3 text-sm text-gray-600">Due: Jan {15 + item}, 2024</p>
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">
                       {item % 2 === 0 ? 'Active' : 'Draft'}
                     </span>
                     <span className="text-xs text-gray-500">{20 - item * 2} submissions</span>
@@ -155,24 +155,24 @@ const Courses = () => {
       case 'resources':
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Learning Resources</h3>
               <button 
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="w-4 h-4" />
                 <span>Add Resource</span>
               </button>
             </div>
             
             {showForm && (
-              <div className="bg-gray-50 rounded-lg p-6 border">
-                <h4 className="font-medium text-gray-800 mb-4">Add Learning Resource</h4>
+              <div className="p-6 border rounded-lg bg-gray-50">
+                <h4 className="mb-4 font-medium text-gray-800">Add Learning Resource</h4>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Resource Title</label>
+                      <label className="block mb-2 text-sm font-medium text-gray-700">Resource Title</label>
                       <input 
                         type="text" 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -180,7 +180,7 @@ const Courses = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                      <label className="block mb-2 text-sm font-medium text-gray-700">Type</label>
                       <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
                         <option>PDF Document</option>
                         <option>Video Lecture</option>
@@ -190,7 +190,7 @@ const Courses = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Description</label>
                     <textarea 
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -198,12 +198,12 @@ const Courses = () => {
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    <button className="px-4 py-2 text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700">
                       Add Resource
                     </button>
                     <button 
                       onClick={() => setShowForm(false)}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
                     >
                       Cancel
                     </button>
@@ -212,17 +212,17 @@ const Courses = () => {
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {[
                 { title: 'Algorithm Analysis Notes', type: 'PDF', size: '2.5 MB' },
                 { title: 'Data Structures Video Series', type: 'Video', duration: '45 min' },
                 { title: 'Programming Best Practices', type: 'Link', domain: 'external' },
                 { title: 'Midterm Study Guide', type: 'PDF', size: '1.8 MB' }
               ].map((resource, index) => (
-                <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-800 mb-2">{resource.title}</h4>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded-full">
+                <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <h4 className="mb-2 font-medium text-gray-800">{resource.title}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">
                       {resource.type}
                     </span>
                     <span className="text-xs text-gray-500">
@@ -243,13 +243,13 @@ const Courses = () => {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-800">Student Feedback</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
                 { rating: 4.5, comment: 'Great explanation of complex topics', student: 'Anonymous', course: 'CS301' },
                 { rating: 5.0, comment: 'Very helpful office hours', student: 'Student A', course: 'CS202' },
                 { rating: 4.2, comment: 'Assignments are challenging but fair', student: 'Anonymous', course: 'CS301' }
               ].map((feedback, index) => (
-                <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
@@ -262,15 +262,15 @@ const Courses = () => {
                           }`} 
                         />
                       ))}
-                      <span className="text-sm font-medium text-gray-700 ml-1">
+                      <span className="ml-1 text-sm font-medium text-gray-700">
                         {feedback.rating}
                       </span>
                     </div>
-                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
+                    <span className="px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded-full">
                       {feedback.course}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">"{feedback.comment}"</p>
+                  <p className="mb-2 text-sm text-gray-600">"{feedback.comment}"</p>
                   <p className="text-xs text-gray-500">- {feedback.student}</p>
                 </div>
               ))}
@@ -285,10 +285,10 @@ const Courses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <BookOpen className="h-8 w-8 text-blue-600" />
+          <div className="flex items-center mb-4 space-x-3">
+            <BookOpen className="w-8 h-8 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-800">Course Management</h1>
           </div>
           <p className="text-gray-600">
@@ -297,7 +297,7 @@ const Courses = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
           <div className="flex overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -314,7 +314,7 @@ const Courses = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="w-4 h-4" />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -323,7 +323,7 @@ const Courses = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
           {renderTabContent()}
         </div>
       </div>

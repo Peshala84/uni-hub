@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContexts';
 import Navbar from './components/users/Navbar';
-import Home from './pages/Home';
+import Home from './pages/lecturer/Home';
 import Login from './components/users/Login';
-import Courses from './pages/Courses';
-import Notifications from './pages/Notification';
-import ProfilePage from './pages/Profile';
+import Courses from './pages/lecturer/Courses';
+import Notifications from './pages/lecturer/Notification';
+import ProfilePage from './pages/lecturer/Profile';
 
 function App() {
   return (
