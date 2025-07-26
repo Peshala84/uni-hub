@@ -7,9 +7,9 @@ const Courses = () => {
   const [showForm, setShowForm] = useState(false);
 
   const tabs = [
-    { id: 'announcements', label: 'Announcements', icon: MessageSquare, color: 'text-blue-600' },
+    { id: 'announcements', label: 'Announcements', icon: MessageSquare, color: 'text-green-600' },
     { id: 'assignments', label: 'Assignments', icon: FileText, color: 'text-green-600' },
-    { id: 'resources', label: 'Learning Resources', icon: BookMarked, color: 'text-purple-600' },
+    { id: 'resources', label: 'Learning Resources', icon: BookMarked, color: 'text-green-600' },
     { id: 'queries', label: 'Student Queries', icon: HelpCircle, color: 'text-orange-600' },
     { id: 'feedback', label: 'Feedback', icon: Star, color: 'text-yellow-600' }
   ];
@@ -23,7 +23,7 @@ const Courses = () => {
               <h3 className="text-xl font-semibold text-gray-800">Course Announcements</h3>
               <button 
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Announcement</span>
@@ -38,7 +38,7 @@ const Courses = () => {
                     <label className="block mb-2 text-sm font-medium text-gray-700">Title</label>
                     <input 
                       type="text" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       placeholder="Enter announcement title"
                     />
                   </div>
@@ -46,12 +46,12 @@ const Courses = () => {
                     <label className="block mb-2 text-sm font-medium text-gray-700">Content</label>
                     <textarea 
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       placeholder="Enter announcement content"
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <button className="px-4 py-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
                       Publish
                     </button>
                     <button 
@@ -159,7 +159,7 @@ const Courses = () => {
               <h3 className="text-xl font-semibold text-gray-800">Learning Resources</h3>
               <button 
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700"
+                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Resource</span>
@@ -175,13 +175,13 @@ const Courses = () => {
                       <label className="block mb-2 text-sm font-medium text-gray-700">Resource Title</label>
                       <input 
                         type="text" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         placeholder="Enter resource title"
                       />
                     </div>
                     <div>
                       <label className="block mb-2 text-sm font-medium text-gray-700">Type</label>
-                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
                         <option>PDF Document</option>
                         <option>Video Lecture</option>
                         <option>External Link</option>
@@ -193,12 +193,12 @@ const Courses = () => {
                     <label className="block mb-2 text-sm font-medium text-gray-700">Description</label>
                     <textarea 
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       placeholder="Enter resource description"
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700">
+                    <button className="px-4 py-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
                       Add Resource
                     </button>
                     <button 
@@ -222,7 +222,7 @@ const Courses = () => {
                 <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg">
                   <h4 className="mb-2 font-medium text-gray-800">{resource.title}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">
+                    <span className="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">
                       {resource.type}
                     </span>
                     <span className="text-xs text-gray-500">
@@ -310,7 +310,7 @@ const Courses = () => {
                   }}
                   className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === tab.id
-                      ? `border-blue-500 ${tab.color} bg-blue-50`
+                      ? `border-green-500 ${tab.color} bg-blue-50`
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >

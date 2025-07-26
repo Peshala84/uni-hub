@@ -2,6 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContexts';
 import Lecturer from './pages/lecturer/Lecturer';
+
+import Admin from './pages/admin/Admin'
+
 import Navbar from './components/users/Navbar';
 
 import Home from './pages/lecturer/Home';
@@ -16,6 +19,7 @@ import PeerLearning from './components/users/PeerLearning';
 import FeedbackForum from './components/users/FeedbackForum';
 import StudentProfile from './components/users/StudentProfile';
 
+
 function App() {
   return (
     <AuthProvider>
@@ -25,6 +29,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/lecturer" replace />} />
             <Route path="/lecturer/*" element={<Lecturer />} />
+
+            <Route path="/admin/*" element={<Admin />} />
+
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/courses" element={<Courses />} />
@@ -37,6 +44,7 @@ function App() {
             <Route path="/student/peer-learning" element={<PeerLearning />} />
             <Route path="/student/feedback-forum" element={<FeedbackForum />} />
             <Route path="/student/profile" element={<StudentProfile />} />
+
           </Routes>
         </div>
       </Router>
