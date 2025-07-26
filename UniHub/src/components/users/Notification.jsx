@@ -114,7 +114,7 @@ const Notification = () => {
     <div className="p-6 bg-white shadow-lg rounded-xl">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <Bell className="w-6 h-6 text-blue-600" />
+          <Bell className="w-6 h-6 text-green-500" />
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
             <p className="text-sm text-gray-600">
@@ -126,7 +126,7 @@ const Notification = () => {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+            className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
           >
             <CheckCircle className="w-4 h-4" />
             <span>Mark All Read</span>
@@ -145,7 +145,7 @@ const Notification = () => {
             onClick={() => setFilter(tab.key)}
             className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               filter === tab.key
-                ? 'bg-white text-blue-600 shadow-sm'
+                ? 'bg-white text-green-600 shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
@@ -153,7 +153,7 @@ const Notification = () => {
             {tab.count > 0 && (
               <span className={`px-2 py-1 text-xs rounded-full ${
                 filter === tab.key 
-                  ? 'bg-blue-100 text-blue-800' 
+                  ? 'bg-blue-100 text-green-800' 
                   : 'bg-gray-200 text-gray-600'
               }`}>
                 {tab.count}
@@ -205,15 +205,6 @@ const Notification = () => {
                           <Clock className="w-3 h-3" />
                           <span>{notification.time}</span>
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          notification.priority === 'high' 
-                            ? 'bg-red-100 text-red-800'
-                            : notification.priority === 'medium'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}>
-                          {notification.priority} priority
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -222,7 +213,7 @@ const Notification = () => {
                     {!notification.read && (
                       <button
                         onClick={() => markAsRead(notification.id)}
-                        className="p-2 text-gray-400 transition-colors hover:text-blue-600"
+                        className="p-2 text-gray-400 transition-colors hover:text-green-600"
                         title="Mark as read"
                       >
                         <CheckCircle className="w-4 h-4" />
