@@ -3,22 +3,47 @@ import { User, Mail, Phone, MapPin, Building, Edit3, Save, X, Camera } from 'luc
 import { useAuth } from '../../contexts/AuthContexts';
 
 const Profile = () => {
-  const { lecturerData } = useAuth();
+  const { userData, userRole } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: lecturerData?.name || '',
-    email: lecturerData?.email || '',
-    phone: lecturerData?.phone || '',
-    department: lecturerData?.department || '',
-    office: lecturerData?.office || '',
-    bio: 'Dr. Sarah Johnson is a dedicated educator with over 10 years of experience in Computer Science. She specializes in algorithms, data structures, and software engineering. Her research interests include machine learning applications in education and computational complexity theory.',
-    qualifications: [
-      'Ph.D. in Computer Science - Stanford University (2012)',
-      'M.S. in Computer Science - MIT (2008)',
-      'B.S. in Computer Science - UC Berkeley (2006)'
-    ],
-    expertise: ['Algorithms & Data Structures', 'Software Engineering', 'Machine Learning', 'Database Systems']
-  });
+  
+  // Initialize form data based on user role
+  const getInitialFormData = () => {
+    const baseData = {
+      name: userData?.name || '',
+      email: userData?.email || '',
+      department: userData?.department || '',
+    };
+
+    if (userRole === 'lecturer') {
+      return {
+        ...baseData,
+        phone: userData?.phone || '',
+        office: userData?.office || '',
+        bio: userData?.bio || 'Dr. Sarah Johnson is a dedicated educator with over 10 years of experience in Computer Science. She specializes in algorithms, data structures, and software engineering. Her research interests include machine learning applications in education and computational complexity theory.',
+        qualifications: userData?.qualifications || [
+          'Ph.D. in Computer Science - Stanford University (2012)',
+          'M.S. in Computer Science - MIT (2008)',
+          'B.S. in Computer Science - UC Berkeley (2006)'
+        ],
+        expertise: userData?.expertise || ['Algorithms & Data Structures', 'Software Engineering', 'Machine Learning', 'Database Systems']
+      };
+    } else if (userRole === 'student') {
+      return {
+        ...baseData,
+        studentId: userData?.studentId || '',
+        year: userData?.year || '',
+        gpa: userData?.gpa || '3.85',
+        phone: userData?.phone || '',
+        address: userData?.address || '',
+        emergencyContact: userData?.emergencyContact || '',
+        courses: userData?.courses || ['Data Structures', 'Database Systems', 'Software Engineering', 'Machine Learning', 'Web Development', 'Computer Networks']
+      };
+    }
+
+    return baseData;
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData());
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,20 +59,7 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    setFormData({
-      name: lecturerData?.name || '',
-      email: lecturerData?.email || '',
-      phone: lecturerData?.phone || '',
-      department: lecturerData?.department || '',
-      office: lecturerData?.office || '',
-      bio: 'Dr. Sarah Johnson is a dedicated educator with over 10 years of experience in Computer Science. She specializes in algorithms, data structures, and software engineering. Her research interests include machine learning applications in education and computational complexity theory.',
-      qualifications: [
-        'Ph.D. in Computer Science - Stanford University (2012)',
-        'M.S. in Computer Science - MIT (2008)',
-        'B.S. in Computer Science - UC Berkeley (2006)'
-      ],
-      expertise: ['Algorithms & Data Structures', 'Software Engineering', 'Machine Learning', 'Database Systems']
-    });
+    setFormData(getInitialFormData());
     setIsEditing(false);
   };
 
@@ -56,7 +68,10 @@ const Profile = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <User className="h-6 w-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {userRole === 'student' ? 'Student Profile' : 
+             userRole === 'lecturer' ? 'Faculty Profile' : 'Profile Information'}
+          </h2>
         </div>
         
         {!isEditing ? (
@@ -150,97 +165,177 @@ const Profile = () => {
                   <input
                     type="tel"
                     name="phone"
-                    value={formData.phone}
+                    value={formData.phone || ''}
                     onChange={handleInputChange}
                     className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    placeholder="Phone number"
                   />
                 ) : (
-                  <span className="text-gray-700 text-sm">{formData.phone}</span>
+                  <span className="text-gray-700 text-sm">{formData.phone || 'Not provided'}</span>
                 )}
               </div>
               
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-gray-400" />
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="office"
-                    value={formData.office}
-                    onChange={handleInputChange}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                  />
-                ) : (
-                  <span className="text-gray-700 text-sm">{formData.office}</span>
-                )}
-              </div>
+              {/* Role-specific fields */}
+              {userRole === 'lecturer' && (
+                <div className="flex items-center space-x-3">
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="office"
+                      value={formData.office || ''}
+                      onChange={handleInputChange}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      placeholder="Office location"
+                    />
+                  ) : (
+                    <span className="text-gray-700 text-sm">{formData.office || 'Not provided'}</span>
+                  )}
+                </div>
+              )}
+
+              {userRole === 'student' && (
+                <>
+                  <div className="flex items-center space-x-3">
+                    <Building className="h-5 w-5 text-gray-400" />
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        name="studentId"
+                        value={formData.studentId || ''}
+                        onChange={handleInputChange}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                        placeholder="Student ID"
+                      />
+                    ) : (
+                      <span className="text-gray-700 text-sm">ID: {formData.studentId || 'Not provided'}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <User className="h-5 w-5 text-gray-400" />
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        name="year"
+                        value={formData.year || ''}
+                        onChange={handleInputChange}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                        placeholder="Academic year"
+                      />
+                    ) : (
+                      <span className="text-gray-700 text-sm">{formData.year || 'Not provided'}</span>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
 
         {/* Profile Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Biography */}
+          {/* Biography / Academic Info */}
           <div className="bg-gray-50 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Biography</h4>
-            {isEditing ? (
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 leading-relaxed"
-              />
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">
+              {userRole === 'student' ? 'Academic Information' : 'Biography'}
+            </h4>
+            {userRole === 'student' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">GPA</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="gpa"
+                      value={formData.gpa || ''}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      placeholder="GPA"
+                    />
+                  ) : (
+                    <p className="text-gray-700 text-lg font-semibold">{formData.gpa || 'Not provided'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="emergencyContact"
+                      value={formData.emergencyContact || ''}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      placeholder="Emergency contact"
+                    />
+                  ) : (
+                    <p className="text-gray-700">{formData.emergencyContact || 'Not provided'}</p>
+                  )}
+                </div>
+              </div>
             ) : (
-              <p className="text-gray-700 leading-relaxed">{formData.bio}</p>
+              <>
+                {isEditing ? (
+                  <textarea
+                    name="bio"
+                    value={formData.bio || ''}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 leading-relaxed"
+                    placeholder="Tell us about yourself..."
+                  />
+                ) : (
+                  <p className="text-gray-700 leading-relaxed">{formData.bio || 'No biography available'}</p>
+                )}
+              </>
             )}
           </div>
 
-          {/* Qualifications */}
-          <div className="bg-gray-50 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Education & Qualifications</h4>
-            <div className="space-y-3">
-              {formData.qualifications.map((qualification, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
-                  <span className="text-gray-700">{qualification}</span>
+          {/* Role-specific sections */}
+          {userRole === 'lecturer' && (
+            <>
+              {/* Qualifications */}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Education & Qualifications</h4>
+                <div className="space-y-3">
+                  {(formData.qualifications || []).map((qualification, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                      <span className="text-gray-700">{qualification}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Expertise */}
-          <div className="bg-gray-50 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Areas of Expertise</h4>
-            <div className="flex flex-wrap gap-2">
-              {formData.expertise.map((skill, index) => (
-                <span 
-                  key={index}
-                  className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full border border-blue-200"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
+              {/* Expertise */}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Areas of Expertise</h4>
+                <div className="flex flex-wrap gap-2">
+                  {(formData.expertise || []).map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
-          {/* Teaching Statistics */}
-          <div className="bg-gray-50 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Teaching Statistics</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                <div className="text-2xl font-bold text-blue-600 mb-1">8</div>
-                <div className="text-sm text-gray-600">Courses Taught</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                <div className="text-2xl font-bold text-green-600 mb-1">324</div>
-                <div className="text-sm text-gray-600">Students Mentored</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                <div className="text-2xl font-bold text-purple-600 mb-1">4.7</div>
-                <div className="text-sm text-gray-600">Average Rating</div>
+          {userRole === 'student' && (
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">Enrolled Courses</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {(formData.courses || []).map((course, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700">{course}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

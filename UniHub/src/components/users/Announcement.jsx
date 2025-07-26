@@ -1,55 +1,160 @@
 import React, { useState } from 'react';
-import { Calendar, User, ChevronRight, X } from 'lucide-react';
+import { Calendar as CalendarIcon, User, ChevronRight, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContexts';
 import { useNavigate } from 'react-router-dom';
 
-const mockAnnouncements = [
-  {
-    id: 1,
-    title: 'Mid-term Examination Schedule Released',
-    content: 'The mid-term examination schedule for Fall 2024 has been published. Please check your course portals for specific dates and venues. All students are required to carry their university ID cards during examinations. Late arrivals will not be accommodated beyond 30 minutes of the scheduled start time.',
-    date: '2024-01-15',
-    author: 'Academic Office',
-    priority: 'high',
-    category: 'Academic'
-  },
-  {
-    id: 2,
-    title: 'Library Extended Hours During Finals',
-    content: 'The university library will extend its operating hours during the final examination period. New hours: Monday-Friday 7:00 AM - 12:00 AM, Saturday-Sunday 9:00 AM - 10:00 PM. Additional study spaces have been arranged in the student center.',
-    date: '2024-01-12',
-    author: 'Library Services',
-    priority: 'medium',
-    category: 'Facilities'
-  },
-  {
-    id: 3,
-    title: 'Research Grant Application Deadline',
-    content: 'Faculty members interested in applying for the Spring 2024 research grants must submit their applications by February 1st, 2024. All required documents and proposal guidelines are available on the faculty portal. Contact the research office for assistance.',
-    date: '2024-01-10',
-    author: 'Research Office',
-    priority: 'high',
-    category: 'Research'
-  },
-  {
-    id: 4,
-    title: 'Campus Wi-Fi Maintenance Scheduled',
-    content: 'Routine maintenance of the campus network infrastructure will take place this weekend. Users may experience intermittent connectivity issues between 2:00 AM - 6:00 AM on Saturday and Sunday. Please plan accordingly.',
-    date: '2024-01-08',
-    author: 'IT Services',
-    priority: 'low',
-    category: 'Technical'
-  }
-];
+const mockAnnouncements = {
+  student: [
+    {
+      id: 1,
+      title: 'Mid-term Examination Schedule Released',
+      content: 'The mid-term examination schedule for Fall 2024 has been published. Please check your course portals for specific dates and venues. All students are required to carry their university ID cards during examinations. Late arrivals will not be accommodated beyond 30 minutes of the scheduled start time.',
+      date: '2024-01-15',
+      author: 'Academic Office',
+      priority: 'high',
+      category: 'Academic',
+      targetAudience: 'student'
+    },
+    {
+      id: 2,
+      title: 'Library Extended Hours During Finals',
+      content: 'The university library will extend its operating hours during the final examination period. New hours: Monday-Friday 7:00 AM - 12:00 AM, Saturday-Sunday 9:00 AM - 10:00 PM. Additional study spaces have been arranged in the student center.',
+      date: '2024-01-12',
+      author: 'Library Services',
+      priority: 'medium',
+      category: 'Facilities',
+      targetAudience: 'student'
+    },
+    {
+      id: 3,
+      title: 'Course Registration Deadline Extended',
+      content: 'The deadline for course registration has been extended to January 20th, 2024. Students who have not completed their registration are advised to meet with their academic advisors immediately. Late registration fees may apply after this date.',
+      date: '2024-01-10',
+      author: 'Registrar Office',
+      priority: 'high',
+      category: 'Academic',
+      targetAudience: 'student'
+    },
+    {
+      id: 4,
+      title: 'Student Health Services Update',
+      content: 'Student Health Services will be offering free flu vaccinations throughout the month. Appointments can be scheduled through the student portal. The health center will also extend hours during exam period.',
+      date: '2024-01-08',
+      author: 'Health Services',
+      priority: 'low',
+      category: 'Health',
+      targetAudience: 'student'
+    }
+  ],
+  lecturer: [
+    {
+      id: 5,
+      title: 'Faculty Meeting - Curriculum Review',
+      content: 'All faculty members are required to attend the curriculum review meeting scheduled for January 25th, 2024, at 2:00 PM in the main conference hall. We will discuss updates to course materials and new teaching methodologies.',
+      date: '2024-01-15',
+      author: 'Dean Office',
+      priority: 'high',
+      category: 'Academic',
+      targetAudience: 'lecturer'
+    },
+    {
+      id: 6,
+      title: 'Research Grant Application Deadline',
+      content: 'Faculty members interested in applying for the Spring 2024 research grants must submit their applications by February 1st, 2024. All required documents and proposal guidelines are available on the faculty portal. Contact the research office for assistance.',
+      date: '2024-01-12',
+      author: 'Research Office',
+      priority: 'high',
+      category: 'Research',
+      targetAudience: 'lecturer'
+    },
+    {
+      id: 7,
+      title: 'New Learning Management System Training',
+      content: 'Training sessions for the new LMS will be conducted next week. All faculty members are encouraged to attend. Sessions will cover course setup, grading tools, and student communication features. Multiple time slots available.',
+      date: '2024-01-10',
+      author: 'IT Training Center',
+      priority: 'medium',
+      category: 'Technology',
+      targetAudience: 'lecturer'
+    },
+    {
+      id: 8,
+      title: 'Faculty Parking Permit Renewal',
+      content: 'Faculty parking permits for the Spring semester are now available for renewal. Please visit the campus security office with your faculty ID and vehicle registration. Early renewal discount available until January 31st.',
+      date: '2024-01-08',
+      author: 'Campus Security',
+      priority: 'low',
+      category: 'Administrative',
+      targetAudience: 'lecturer'
+    }
+  ],
+  general: [
+    {
+      id: 9,
+      title: 'Campus Wi-Fi Maintenance Scheduled',
+      content: 'Routine maintenance of the campus network infrastructure will take place this weekend. Users may experience intermittent connectivity issues between 2:00 AM - 6:00 AM on Saturday and Sunday. Please plan accordingly.',
+      date: '2024-01-08',
+      author: 'IT Services',
+      priority: 'low',
+      category: 'Technical',
+      targetAudience: 'general'
+    },
+    {
+      id: 10,
+      title: 'Campus Safety Drill Announcement',
+      content: 'A campus-wide emergency preparedness drill will be conducted on January 30th at 10:00 AM. All students, faculty, and staff are required to participate. Emergency procedures will be reviewed prior to the drill.',
+      date: '2024-01-05',
+      author: 'Safety Office',
+      priority: 'medium',
+      category: 'Safety',
+      targetAudience: 'general'
+    }
+  ]
+};
 
 const Announcement = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userRole } = useAuth();
   const navigate = useNavigate();
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState('all');
+
+  // Get announcements based on user role
+  const getAnnouncementsForRole = () => {
+    if (!isLoggedIn) {
+      // Show general announcements for non-logged-in users
+      return [...mockAnnouncements.general].slice(0, 3);
+    }
+
+    let announcements = [];
+    
+    // Add role-specific announcements
+    if (userRole === 'student') {
+      announcements = [...mockAnnouncements.student];
+    } else if (userRole === 'lecturer') {
+      announcements = [...mockAnnouncements.lecturer];
+    }
+    
+    // Add general announcements for all logged-in users
+    announcements = [...announcements, ...mockAnnouncements.general];
+    
+    // Sort by date (newest first)
+    return announcements.sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
+
+  const filteredAnnouncements = getAnnouncementsForRole().filter(announcement => {
+    if (selectedFilter === 'all') return true;
+    return announcement.category.toLowerCase() === selectedFilter.toLowerCase();
+  });
+
+  const getUniqueCategories = () => {
+    const announcements = getAnnouncementsForRole();
+    const categories = [...new Set(announcements.map(a => a.category))];
+    return categories;
+  };
 
   const handleAnnouncementClick = (announcement) => {
     if (!isLoggedIn) {
-      navigate('/login');
+      navigate('/lecturer/login');
       return;
     }
     setSelectedAnnouncement(announcement);
@@ -75,14 +180,57 @@ const Announcement = () => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Latest Announcements</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {isLoggedIn ? 
+              (userRole === 'student' ? 'Student Announcements' : 
+               userRole === 'lecturer' ? 'Faculty Announcements' : 'Announcements') 
+              : 'Latest Announcements'
+            }
+          </h2>
+          {isLoggedIn && (
+            <p className="text-sm text-gray-500 mt-1">
+              {userRole === 'student' ? 'Important updates for students' : 
+               userRole === 'lecturer' ? 'Faculty notices and updates' : 'General announcements'}
+            </p>
+          )}
+        </div>
         {!isLoggedIn && (
           <p className="text-sm text-gray-500">Click any item to login and view details</p>
         )}
       </div>
 
+      {/* Filter Tabs (only show when logged in) */}
+      {isLoggedIn && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button
+            onClick={() => setSelectedFilter('all')}
+            className={`px-3 py-1 text-sm rounded-full transition-colors ${
+              selectedFilter === 'all'
+                ? 'bg-blue-100 text-blue-700 font-medium'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            All
+          </button>
+          {getUniqueCategories().map(category => (
+            <button
+              key={category}
+              onClick={() => setSelectedFilter(category)}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                selectedFilter === category
+                  ? 'bg-blue-100 text-blue-700 font-medium'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-4">
-        {mockAnnouncements.map((announcement) => (
+        {filteredAnnouncements.map((announcement) => (
           <div
             key={announcement.id}
             onClick={() => handleAnnouncementClick(announcement)}
@@ -97,6 +245,15 @@ const Announcement = () => {
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                     {announcement.category}
                   </span>
+                  {isLoggedIn && announcement.targetAudience && (
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      announcement.targetAudience === 'student' ? 'bg-blue-100 text-blue-700' :
+                      announcement.targetAudience === 'lecturer' ? 'bg-purple-100 text-purple-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {announcement.targetAudience === 'general' ? 'All' : announcement.targetAudience}
+                    </span>
+                  )}
                 </div>
                 
                 <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-2">
@@ -109,7 +266,7 @@ const Announcement = () => {
                 
                 <div className="flex items-center space-x-4 text-xs text-gray-500">
                   <div className="flex items-center space-x-1">
-                    <Calendar className="h-3 w-3" />
+                    <CalendarIcon className="h-3 w-3" />
                     <span>{formatDate(announcement.date)}</span>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -138,6 +295,16 @@ const Announcement = () => {
                   <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                     {selectedAnnouncement.category}
                   </span>
+                  {selectedAnnouncement.targetAudience && (
+                    <span className={`text-sm px-3 py-1 rounded-full ${
+                      selectedAnnouncement.targetAudience === 'student' ? 'bg-blue-100 text-blue-700' :
+                      selectedAnnouncement.targetAudience === 'lecturer' ? 'bg-purple-100 text-purple-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {selectedAnnouncement.targetAudience === 'general' ? 'All Users' : 
+                       selectedAnnouncement.targetAudience === 'student' ? 'Students' : 'Faculty'}
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={() => setSelectedAnnouncement(null)}
@@ -153,7 +320,7 @@ const Announcement = () => {
               
               <div className="flex items-center space-x-4 text-sm text-gray-500 mb-6">
                 <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
+                  <CalendarIcon className="h-4 w-4" />
                   <span>{formatDate(selectedAnnouncement.date)}</span>
                 </div>
                 <div className="flex items-center space-x-1">

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff, GraduationCap, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContexts';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('student'); // Default to student
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -13,13 +14,21 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Login form submitted with:', { email, password, role });
     setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {
-      login({ email, password });
+      console.log('Calling login function...');
+      login({ email, password }, role);
       setIsLoading(false);
-      navigate('/');
+      console.log('Login completed, navigating...');
+      // Navigate based on role
+      if (role === 'lecturer') {
+        navigate('/lecturer');
+      } else {
+        navigate('/student/dashboard');
+      }
     }, 1000);
   };
 
@@ -28,14 +37,54 @@ const Login = () => {
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <div className="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LogIn className="h-8 w-8 text-white" />
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              role === 'lecturer' ? 'bg-purple-600' : 'bg-blue-600'
+            }`}>
+              {role === 'lecturer' ? (
+                <GraduationCap className="h-8 w-8 text-white" />
+              ) : (
+                <Users className="h-8 w-8 text-white" />
+              )}
             </div>
             <h2 className="text-3xl font-bold text-gray-800">Welcome Back</h2>
-            <p className="text-gray-600 mt-2">Sign in to your lecturer account</p>
+            <p className="text-gray-600 mt-2">
+              Sign in to your {role} account
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Role Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Login as
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole('student')}
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                    role === 'student'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <Users className="h-5 w-5 mx-auto mb-1" />
+                  <div className="text-sm font-medium">Student</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('lecturer')}
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                    role === 'lecturer'
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <GraduationCap className="h-5 w-5 mx-auto mb-1" />
+                  <div className="text-sm font-medium">Lecturer</div>
+                </button>
+              </div>
+            </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
