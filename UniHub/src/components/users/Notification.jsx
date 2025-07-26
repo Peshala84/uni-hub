@@ -111,13 +111,13 @@ const Notification = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="p-6 bg-white shadow-lg rounded-xl">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <Bell className="h-6 w-6 text-blue-600" />
+          <Bell className="w-6 h-6 text-blue-600" />
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-            <p className="text-gray-600 text-sm">
+            <p className="text-sm text-gray-600">
               {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up!'}
             </p>
           </div>
@@ -126,20 +126,19 @@ const Notification = () => {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
           >
-            <CheckCircle className="h-4 w-4" />
+            <CheckCircle className="w-4 h-4" />
             <span>Mark All Read</span>
           </button>
         )}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
+      <div className="flex p-1 mb-6 space-x-1 bg-gray-100 rounded-lg">
         {[
           { key: 'all', label: 'All', count: notifications.length },
           { key: 'unread', label: 'Unread', count: unreadCount },
-          { key: 'high', label: 'High Priority', count: notifications.filter(n => n.priority === 'high').length }
         ].map((tab) => (
           <button
             key={tab.key}
@@ -165,10 +164,10 @@ const Notification = () => {
       </div>
 
       {/* Notifications List */}
-      <div className="space-y-4 max-h-96 overflow-y-auto">
+      <div className="space-y-4 overflow-y-auto max-h-96">
         {filteredNotifications.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+          <div className="py-8 text-center text-gray-500">
+            <Bell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No notifications to display</p>
           </div>
         ) : (
@@ -182,13 +181,13 @@ const Notification = () => {
                 } rounded-lg p-4 transition-all duration-200`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4 flex-1">
+                  <div className="flex items-start flex-1 space-x-4">
                     <div className={`p-2 rounded-full ${getTypeColor(notification.type)}`}>
-                      <Icon className="h-5 w-5" />
+                      <Icon className="w-5 h-5" />
                     </div>
                     
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
+                      <div className="flex items-center mb-1 space-x-2">
                         <h3 className={`font-semibold ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
                           {notification.title}
                         </h3>
@@ -197,13 +196,13 @@ const Notification = () => {
                         )}
                       </div>
                       
-                      <p className="text-gray-600 mb-2 text-sm">
+                      <p className="mb-2 text-sm text-gray-600">
                         {notification.message}
                       </p>
                       
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <div className="flex items-center space-x-1">
-                          <Clock className="h-3 w-3" />
+                          <Clock className="w-3 h-3" />
                           <span>{notification.time}</span>
                         </div>
                         <span className={`px-2 py-1 text-xs rounded-full ${
@@ -219,22 +218,22 @@ const Notification = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2 ml-4">
+                  <div className="flex items-center ml-4 space-x-2">
                     {!notification.read && (
                       <button
                         onClick={() => markAsRead(notification.id)}
-                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                        className="p-2 text-gray-400 transition-colors hover:text-blue-600"
                         title="Mark as read"
                       >
-                        <CheckCircle className="h-4 w-4" />
+                        <CheckCircle className="w-4 h-4" />
                       </button>
                     )}
                     <button
                       onClick={() => deleteNotification(notification.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      className="p-2 text-gray-400 transition-colors hover:text-red-600"
                       title="Delete notification"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
