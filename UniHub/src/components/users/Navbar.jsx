@@ -60,7 +60,7 @@ const Navbar = () => {
               )}
             </div>
             <span className="text-xl font-bold text-gray-800 transition-colors group-hover:text-blue-600">
-              {userRole === 'lecturer' ? 'EduPortal - Lecturer' : userRole === 'student' ? 'EduPortal - Student' : 'EduPortal'}
+              {userRole === 'lecturer' ? 'UniHub - Lecturer' : userRole === 'student' ? 'UniHub - Student' : 'UniHub'}
             </span>
           </Link>
 
