@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContexts';
+import Lecturer from './pages/lecturer/Lecturer';
 import Navbar from './components/users/Navbar';
 
 import Home from './pages/lecturer/Home';
