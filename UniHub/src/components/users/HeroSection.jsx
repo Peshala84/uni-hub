@@ -13,11 +13,11 @@ const HeroSection = () => {
           </div>
           
           <h1 className="mb-6 text-4xl font-bold leading-tight md:text-6xl">
-            Metropolitan University
+            NSBM Green University
           </h1>
           
           <p className="max-w-3xl mx-auto mb-8 text-xl leading-relaxed text-blue-100 md:text-2xl">
-            Welcome to your comprehensive lecturer management portal. Streamline your teaching, 
+            Welcome to lecturer. Streamline your teaching, 
             manage courses, and engage with students efficiently.
           </p>
           

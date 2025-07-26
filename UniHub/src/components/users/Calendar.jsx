@@ -1,178 +1,187 @@
 import React, { useState } from 'react';
-import { Calendar, User, ChevronRight, X } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContexts';
-import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 
-const mockAnnouncements = [
-  {
-    id: 1,
-    title: 'Mid-term Examination Schedule Released',
-    content: 'The mid-term examination schedule for Fall 2024 has been published. Please check your course portals for specific dates and venues. All students are required to carry their university ID cards during examinations. Late arrivals will not be accommodated beyond 30 minutes of the scheduled start time.',
-    date: '2024-01-15',
-    author: 'Academic Office',
-    priority: 'high',
-    category: 'Academic'
-  },
-  {
-    id: 2,
-    title: 'Library Extended Hours During Finals',
-    content: 'The university library will extend its operating hours during the final examination period. New hours: Monday-Friday 7:00 AM - 12:00 AM, Saturday-Sunday 9:00 AM - 10:00 PM. Additional study spaces have been arranged in the student center.',
-    date: '2024-01-12',
-    author: 'Library Services',
-    priority: 'medium',
-    category: 'Facilities'
-  },
-  {
-    id: 3,
-    title: 'Research Grant Application Deadline',
-    content: 'Faculty members interested in applying for the Spring 2024 research grants must submit their applications by February 1st, 2024. All required documents and proposal guidelines are available on the faculty portal. Contact the research office for assistance.',
-    date: '2024-01-10',
-    author: 'Research Office',
-    priority: 'high',
-    category: 'Research'
-  },
-  {
-    id: 4,
-    title: 'Campus Wi-Fi Maintenance Scheduled',
-    content: 'Routine maintenance of the campus network infrastructure will take place this weekend. Users may experience intermittent connectivity issues between 2:00 AM - 6:00 AM on Saturday and Sunday. Please plan accordingly.',
-    date: '2024-01-08',
-    author: 'IT Services',
-    priority: 'low',
-    category: 'Technical'
-  }
+const mockEvents = [
+  { id: 1, date: '2025-07-28', title: 'Faculty Meeting', type: 'meeting' },
+  { id: 2, date: '2025-07-30', title: 'Research Presentation', type: 'academic' },
+  { id: 3, date: '2025-08-02', title: 'Student Registration', type: 'deadline' },
+  { id: 4, date: '2025-08-05', title: 'Semester Start', type: 'academic' },
+  { id: 5, date: '2025-08-15', title: 'Project Submission', type: 'deadline' },
 ];
 
-const Announcement = () => {
-  const { isLoggedIn } = useAuth();
-  const navigate = useNavigate();
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+const Calendar = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const handleAnnouncementClick = (announcement) => {
-    if (!isLoggedIn) {
-      navigate('/login');
-      return;
-    }
-    setSelectedAnnouncement(announcement);
+  const today = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+
+  // Get first day of the month and number of days in month
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  const daysInMonth = lastDayOfMonth.getDate();
+  const startingDayOfWeek = firstDayOfMonth.getDay();
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Generate calendar days
+  const calendarDays = [];
+  
+  // Add empty cells for days before the first day of the month
+  for (let i = 0; i < startingDayOfWeek; i++) {
+    calendarDays.push(null);
+  }
+  
+  // Add days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarDays.push(day);
+  }
+
+  const navigateMonth = (direction) => {
+    const newDate = new Date(currentYear, currentMonth + direction, 1);
+    setCurrentDate(newDate);
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
+  const isToday = (day) => {
+    return (
+      day &&
+      today.getDate() === day &&
+      today.getMonth() === currentMonth &&
+      today.getFullYear() === currentYear
+    );
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const hasEvent = (day) => {
+    if (!day) return false;
+    const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return mockEvents.some(event => event.date === dateString);
+  };
+
+  const getEventsForDay = (day) => {
+    if (!day) return [];
+    const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return mockEvents.filter(event => event.date === dateString);
+  };
+
+  const getEventTypeColor = (type) => {
+    switch (type) {
+      case 'meeting': return 'bg-blue-500';
+      case 'academic': return 'bg-green-500';
+      case 'deadline': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
+      {/* Calendar Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Latest Announcements</h2>
-        {!isLoggedIn && (
-          <p className="text-sm text-gray-500">Click any item to login and view details</p>
-        )}
+        <div className="flex items-center space-x-3">
+          <CalendarIcon className="h-6 w-6 text-blue-600" />
+          <h2 className="text-2xl font-bold text-gray-800">Calendar</h2>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => navigateMonth(-1)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <h3 className="text-lg font-semibold text-gray-700 min-w-[200px] text-center">
+            {monthNames[currentMonth]} {currentYear}
+          </h3>
+          <button
+            onClick={() => navigateMonth(1)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ChevronRight className="h-5 w-5 text-gray-600" />
+          </button>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        {mockAnnouncements.map((announcement) => (
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-1 mb-4">
+        {/* Day headers */}
+        {dayNames.map(day => (
+          <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+            {day}
+          </div>
+        ))}
+        
+        {/* Calendar days */}
+        {calendarDays.map((day, index) => (
           <div
-            key={announcement.id}
-            onClick={() => handleAnnouncementClick(announcement)}
-            className="group border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-blue-300 transition-all duration-200 cursor-pointer"
+            key={index}
+            onClick={() => day && setSelectedDate(day)}
+            className={`
+              relative p-2 h-12 text-center text-sm cursor-pointer rounded-lg transition-colors
+              ${day ? 'hover:bg-blue-50' : ''}
+              ${isToday(day) ? 'bg-blue-100 text-blue-800 font-bold' : ''}
+              ${selectedDate === day ? 'bg-blue-200 text-blue-900' : ''}
+              ${!day ? 'cursor-default' : ''}
+            `}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(announcement.priority)}`}>
-                    {announcement.priority.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                    {announcement.category}
-                  </span>
-                </div>
-                
-                <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-2">
-                  {announcement.title}
-                </h3>
-                
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {isLoggedIn ? announcement.content.substring(0, 120) + '...' : 'Login to view full content...'}
-                </p>
-                
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(announcement.date)}</span>
+            {day && (
+              <>
+                <span className={isToday(day) ? 'font-bold' : ''}>{day}</span>
+                {hasEvent(day) && (
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <User className="h-3 w-3" />
-                    <span>{announcement.author}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors ml-4" />
-            </div>
+                )}
+              </>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Detailed Announcement Modal */}
-      {selectedAnnouncement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getPriorityColor(selectedAnnouncement.priority)}`}>
-                    {selectedAnnouncement.priority.toUpperCase()}
-                  </span>
-                  <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    {selectedAnnouncement.category}
-                  </span>
+      {/* Events for selected day */}
+      {selectedDate && (
+        <div className="mt-6 border-t pt-4">
+          <h4 className="font-semibold text-gray-800 mb-3">
+            Events for {monthNames[currentMonth]} {selectedDate}, {currentYear}
+          </h4>
+          <div className="space-y-2">
+            {getEventsForDay(selectedDate).length > 0 ? (
+              getEventsForDay(selectedDate).map(event => (
+                <div key={event.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                  <div className={`w-3 h-3 rounded-full ${getEventTypeColor(event.type)}`}></div>
+                  <span className="text-sm text-gray-700">{event.title}</span>
+                  <span className="text-xs text-gray-500 capitalize">({event.type})</span>
                 </div>
-                <button
-                  onClick={() => setSelectedAnnouncement(null)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="h-5 w-5 text-gray-500" />
-                </button>
-              </div>
-              
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                {selectedAnnouncement.title}
-              </h2>
-              
-              <div className="flex items-center space-x-4 text-sm text-gray-500 mb-6">
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{formatDate(selectedAnnouncement.date)}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <User className="h-4 w-4" />
-                  <span>{selectedAnnouncement.author}</span>
-                </div>
-              </div>
-              
-              <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {selectedAnnouncement.content}
-                </p>
-              </div>
-            </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No events scheduled for this day.</p>
+            )}
           </div>
         </div>
       )}
+
+      {/* Upcoming Events */}
+      <div className="mt-6 border-t pt-4">
+        <h4 className="font-semibold text-gray-800 mb-3">Upcoming Events</h4>
+        <div className="space-y-2">
+          {mockEvents.slice(0, 3).map(event => (
+            <div key={event.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className={`w-3 h-3 rounded-full ${getEventTypeColor(event.type)}`}></div>
+                <span className="text-sm text-gray-700">{event.title}</span>
+              </div>
+              <span className="text-xs text-gray-500">
+                {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Announcement;
+export default Calendar;
