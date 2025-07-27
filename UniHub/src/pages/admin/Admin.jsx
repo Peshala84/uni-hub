@@ -7,7 +7,8 @@ import AddUser from './AddUser';
 import ViewStudents from './ViewStudents';
 import ViewLecturers from './ViewLecturers';
 import ComingSoon from './ComingSoon';
-import { mockAxios } from './MockAPL';
+import AddAnnouncements from './Anouncements';
+import axios from 'axios';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -21,7 +22,8 @@ const AdminDashboard = () => {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await mockAxios.get('/view_students');
+      // Replace with your real API endpoint
+      const response = await axios.get('/api/view_students');
       setStudents(response.data);
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -33,7 +35,8 @@ const AdminDashboard = () => {
   const fetchLecturers = async () => {
     try {
       setLoading(true);
-      const response = await mockAxios.get('/view_lecturers');
+      // Replace with your real API endpoint
+      const response = await axios.get('/api/view_lecturers');
       setLecturers(response.data);
     } catch (error) {
       console.error('Error fetching lecturers:', error);
@@ -45,15 +48,14 @@ const AdminDashboard = () => {
   const createUser = async (userData) => {
     try {
       setLoading(true);
-      await mockAxios.post('/create_user', userData);
-      
+      // Replace with your real API endpoint
+      await axios.post('/api/create_user', userData);
       // Refresh data based on user role
       if (userData.role === 'STUDENT') {
         await fetchStudents();
       } else {
         await fetchLecturers();
       }
-      
       return { success: true };
     } catch (error) {
       console.error('Error creating user:', error);
@@ -104,6 +106,8 @@ const AdminDashboard = () => {
             onRefresh={fetchLecturers}
           />
         );
+      case 'announcements':
+        return <AddAnnouncements />;
       default:
         return <ComingSoon />;
     }

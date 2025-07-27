@@ -1,33 +1,32 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { Download, Filter, Eye, Edit, Trash2, RefreshCw } from 'lucide-react';
+import { Download, Filter, Eye, RefreshCw, UserCheck, UserX } from 'lucide-react';
+
 
 const ViewStudents = () => {
-  const [lecturers, setLecturers] = useState([]);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const fetchLecturers = useCallback(async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-
-      console.log('Fetching lecturers...');
-
+      console.log('Fetching students...');
       const response = await fetch('http://localhost:8086/api/v1/admin/view_students', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
       console.log('Response status:', response.status);
-
-      // Get response text first
       const responseText = await response.text();
       console.log('Response text:', responseText);
-
       if (response.ok) {
-        // Try to parse as JSON if response is ok
         let data;
         try {
           data = JSON.parse(responseText);
@@ -35,69 +34,134 @@ const ViewStudents = () => {
           console.error('JSON parse error:', parseError);
           throw new Error('Invalid response format from server');
         }
-
-        console.log('Parsed lecturers data:', data);
-        setLecturers(Array.isArray(data) ? data : []);
+        // Debug: log raw data
+        console.log('Raw students data from backend:', data);
+        // Normalize status to is_active boolean (robust)
+        const normalized = Array.isArray(data)
+          ? data.map(l => {
+              const status = (l.status || '').toString().toUpperCase();
+              return {
+                ...l,
+                is_active: !status || status === 'ACTIVE',
+              };
+            })
+          : [];
+        console.log('Parsed students data:', normalized);
+        setStudents(normalized);
       } else {
-        // Handle error response
         let errorMessage;
         try {
-          // Try to parse as JSON first
           const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorData.error || 'Failed to fetch lecturers';
+          errorMessage = errorData.message || errorData.error || 'Failed to fetch students';
         } catch (parseError) {
-          // If not JSON, use the text directly
-          errorMessage = responseText || 'Failed to fetch lecturers';
+          errorMessage = responseText || 'Failed to fetch students';
         }
         throw new Error(errorMessage);
       }
     } catch (err) {
-      console.error('Error fetching lecturers:', err);
-      setError(err.message || 'An error occurred while fetching lecturers');
-      setLecturers([]);
+      console.error('Error fetching students:', err);
+      setError(err.message || 'An error occurred while fetching students');
+      setStudents([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch lecturers on component mount
   useEffect(() => {
-    fetchLecturers();
-  }, [fetchLecturers]);
+    fetchStudents();
+  }, [fetchStudents]);
+
 
   const handleRefresh = useCallback(() => {
-    fetchLecturers();
-  }, [fetchLecturers]);
+    fetchStudents();
+  }, [fetchStudents]);
+
 
   const handleExport = useCallback(() => {
     // TODO: Implement export functionality
-    console.log('Export lecturers data');
+    console.log('Export students data');
   }, []);
 
   const handleFilter = useCallback(() => {
     // TODO: Implement filter functionality
-    console.log('Filter lecturers data');
+    console.log('Filter students data');
   }, []);
 
-  const handleView = useCallback((lecturer) => {
-    // TODO: Implement view lecturer details
-    console.log('View lecturer:', lecturer);
+  const handleActivationToggle = useCallback((student) => {
+    setSelectedStudent(student);
+    setConfirmAction(student.is_active ? 'deactivate' : 'activate');
+    setShowConfirmModal(true);
   }, []);
 
-  const handleEdit = useCallback((lecturer) => {
-    // TODO: Implement edit lecturer functionality
-    console.log('Edit lecturer:', lecturer);
+  const handleConfirmAction = useCallback(async () => {
+    if (!selectedStudent || !confirmAction) return;
+    try {
+      setActionLoading(true);
+      const isDeactivate = confirmAction === 'deactivate';
+      const endpoint = isDeactivate
+        ? 'http://localhost:8086/api/v1/admin/deactivate_user'
+        : 'http://localhost:8086/api/v1/admin/reactivate_user';
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_Id: selectedStudent.user_Id
+        }),
+      });
+      const responseText = await response.text();
+      if (response.ok) {
+        setStudents(prevStudents =>
+          prevStudents.map(student =>
+            student.user_Id === selectedStudent.user_Id
+              ? {
+                  ...student,
+                  is_active: !isDeactivate,
+                  status: isDeactivate ? 'DEACTIVATED' : 'ACTIVE',
+                }
+              : student
+          )
+        );
+        setShowConfirmModal(false);
+        setSelectedStudent(null);
+        setConfirmAction(null);
+        console.log(`Student ${isDeactivate ? 'deactivated' : 'activated'} successfully`);
+      } else {
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.message || errorData.error || `Failed to ${confirmAction} student`;
+        } catch (parseError) {
+          errorMessage = responseText || `Failed to ${confirmAction} student`;
+        }
+        throw new Error(errorMessage);
+      }
+    } catch (err) {
+      console.error(`Error ${confirmAction}ing student:`, err);
+      setError(err.message || `An error occurred while ${confirmAction}ing the student`);
+    } finally {
+      setActionLoading(false);
+    }
+  }, [selectedStudent, confirmAction]);
+
+  const closeConfirmModal = () => {
+    setShowConfirmModal(false);
+    setSelectedStudent(null);
+    setConfirmAction(null);
+  };
+
+
+  const handleView = useCallback((student) => {
+    // TODO: Implement view student details
+    console.log('View student:', student);
   }, []);
 
-  const handleDelete = useCallback((lecturer) => {
-    // TODO: Implement delete lecturer functionality
-    console.log('Delete lecturer:', lecturer);
-  }, []);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white">Lecturers</h2>
+        <h2 className="text-2xl font-bold text-white">Students</h2>
         <button
           onClick={handleRefresh}
           disabled={loading}
@@ -116,18 +180,18 @@ const ViewStudents = () => {
       )}
 
       {/* Loading State */}
-      {loading && lecturers.length === 0 ? (
+      {loading && students.length === 0 ? (
         <div className="text-center py-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#01C38D]"></div>
-          <p className="text-[#696E79] mt-2">Loading lecturers...</p>
+          <p className="text-[#696E79] mt-2">Loading students...</p>
         </div>
       ) : (
-        /* Lecturers Table */
+        /* Students Table */
         <div className="bg-[#132D46] rounded-xl border border-[#191E29] overflow-hidden">
           <div className="p-6 border-b border-[#191E29]">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-white">
-                Lecturers ({lecturers.length})
+                Students ({students.length})
               </h3>
               <div className="flex items-center space-x-4">
                 <button 
@@ -147,11 +211,10 @@ const ViewStudents = () => {
               </div>
             </div>
           </div>
-          
           <div className="overflow-x-auto">
-            {lecturers.length === 0 ? (
+            {students.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-[#696E79]">No lecturers found</p>
+                <p className="text-[#696E79]">No students found</p>
               </div>
             ) : (
               <table className="w-full">
@@ -173,63 +236,70 @@ const ViewStudents = () => {
                       DOB
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#696E79] uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#696E79] uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#191E29]">
-                  {lecturers.map((lecturer) => (
-                    <tr key={lecturer.user_Id} className="hover:bg-[#191E29] transition-colors">
+                  {students.map((student) => (
+                    <tr key={student.user_Id} className="hover:bg-[#191E29] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-10 w-10 bg-[#01C38D] rounded-full flex items-center justify-center">
                             <span className="text-white font-medium">
-                              {lecturer.f_name ? lecturer.f_name.charAt(0) : 'L'}
-                              {lecturer.l_name && lecturer.l_name.charAt(0)}
+                              {student.f_name ? student.f_name.charAt(0) : 'S'}
+                              {student.l_name && student.l_name.charAt(0)}
                             </span>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-white">
-                              {lecturer.f_name || 'Unknown'} {lecturer.l_name || ''}
+                              {student.f_name || 'Unknown'} {student.l_name || ''}
                             </div>
-                            <div className="text-sm text-[#696E79]">{lecturer.email}</div>
+                            <div className="text-sm text-[#696E79]">{student.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{lecturer.contact || 'N/A'}</div>
+                        <div className="text-sm text-white">{student.contact || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{lecturer.NIC || 'N/A'}</div>
+                        <div className="text-sm text-white">{student.NIC || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{lecturer.address || 'N/A'}</div>
+                        <div className="text-sm text-white">{student.address || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{lecturer.DOB || 'N/A'}</div>
+                        <div className="text-sm text-white">{student.DOB || 'N/A'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          student.is_active 
+                            ? 'bg-green-900 bg-opacity-20 text-green-400' 
+                            : 'bg-red-900 bg-opacity-20 text-red-400'
+                        }`}>
+                          {student.is_active ? 'Active' : 'Inactive'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <button 
-                            onClick={() => handleView(lecturer)}
+                            onClick={() => handleView(student)}
                             className="text-[#01C38D] hover:text-white transition-colors"
                             title="View Details"
                           >
                             <Eye size={16} />
                           </button>
                           <button 
-                            onClick={() => handleEdit(lecturer)}
-                            className="text-blue-500 hover:text-white transition-colors"
-                            title="Edit Lecturer"
+                            onClick={() => handleActivationToggle(student)}
+                            className={`hover:text-white transition-colors ${
+                              student.is_active ? 'text-red-500' : 'text-green-500'
+                            }`}
+                            title={student.is_active ? 'Deactivate User' : 'Activate User'}
                           >
-                            <Edit size={16} />
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(lecturer)}
-                            className="text-red-500 hover:text-white transition-colors"
-                            title="Delete Lecturer"
-                          >
-                            <Trash2 size={16} />
+                            {student.is_active ? <UserX size={16} /> : <UserCheck size={16} />}
                           </button>
                         </div>
                       </td>
