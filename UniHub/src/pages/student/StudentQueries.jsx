@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContexts';
+import { useAuth } from '../../../contexts/AuthContexts';
 
 const mockQueries = [
   {

@@ -12,12 +12,12 @@ import Login from './components/users/Login';
 import Courses from './pages/lecturer/Courses';
 import Notifications from './pages/lecturer/Notification';
 import ProfilePage from './pages/lecturer/Profile';
-import StudentQueries from './components/users/StudentQueries';
-import Appointments from './components/users/Appointments';
-import Resources from './components/users/Resources';
-import PeerLearning from './components/users/PeerLearning';
-import FeedbackForum from './components/users/FeedbackForum';
-import StudentProfile from './components/users/StudentProfile';
+import StudentQueries from './pages/student/StudentQueries';
+import Appointments from './pages/student/Appointments';
+import Resources from './pages/student/Resources';
+import PeerLearning from './pages/student/PeerLearning';
+import FeedbackForum from './pages/student/FeedbackForum';
+import StudentProfile from './pages/student/StudentProfile';
 
 
 function App() {
