@@ -9,7 +9,8 @@ import Navbar from './components/users/Navbar';
 
 import Home from './pages/lecturer/Home';
 import Login from './components/users/Login';
-import Courses from './pages/lecturer/Courses';
+import LecturerCourses from './pages/lecturer/Courses';
+import StudentCourses from './pages/student/Courses';
 import Notifications from './pages/lecturer/Notification';
 import ProfilePage from './pages/lecturer/Profile';
 import StudentQueries from './pages/student/StudentQueries';
@@ -34,7 +35,8 @@ function App() {
 
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/courses" element={<Courses />} />
+            <Route path="/courses" element={<LecturerCourses />} />
+            <Route path="/student/courses" element={<StudentCourses />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<ProfilePage />} />
             {/* Student routes */}
