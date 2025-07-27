@@ -11,16 +11,16 @@ const Resources = () => {
     const [resources] = useState(mockResources);
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Resources Shared by Lecturers</h2>
-            <div className="space-y-4">
+        <div className="rounded-xl bg-[#F5F7FA] border border-[#E5E7EB] p-6">
+            <h2 className="text-2xl font-extrabold mb-6 text-[#191E29] tracking-tight">Resources Shared by Lecturers</h2>
+            <div className="space-y-6">
                 {resources.map(r => (
-                    <div key={r.id} className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                    <div key={r.id} className="border border-[#E5E7EB] rounded-xl p-5 bg-white shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
                         <div>
-                            <div className="font-semibold text-gray-800">{r.title}</div>
-                            <div className="text-gray-600 text-sm">Type: {r.type} | Shared by: {r.sharedBy}</div>
+                            <div className="font-semibold text-[#191E29] text-lg">{r.title}</div>
+                            <div className="text-[#696E79] text-sm">Type: {r.type} | Shared by: {r.sharedBy}</div>
                         </div>
-                        <a href={r.url} className="bg-blue-600 text-white px-4 py-1 rounded" download>Download</a>
+                        <a href={r.url} className="bg-[#2CC295] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#191E29] transition-colors" download>Download</a>
                     </div>
                 ))}
             </div>
