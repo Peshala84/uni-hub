@@ -25,7 +25,6 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
-          <Navbar />
           <Routes>
             <Route path="/" element={<Navigate to="/lecturer" replace />} />
             <Route path="/lecturer/*" element={<Lecturer />} />

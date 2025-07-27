@@ -19,10 +19,8 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
     { id: 'add-user', label: 'Add User', icon: UserPlus },
     { id: 'view-students', label: 'View Students', icon: GraduationCap },
     { id: 'view-lecturers', label: 'View Lecturers', icon: UserCheck },
-    { id: 'appointments', label: 'Appointments', icon: Calendar },
     { id: 'queries', label: 'Queries', icon: MessageSquare },
     { id: 'announcements', label: 'Announcements', icon: Bell },
-    { id: 'resources', label: 'Resources', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
