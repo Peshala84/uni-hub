@@ -5,8 +5,6 @@ import Lecturer from './pages/lecturer/Lecturer';
 
 import Admin from './pages/admin/Admin'
 
-import Navbar from './components/users/Navbar';
-
 import Home from './pages/lecturer/Home';
 import Login from './components/users/Login';
 import Courses from './pages/lecturer/Courses';
