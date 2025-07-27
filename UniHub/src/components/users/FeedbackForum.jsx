@@ -37,20 +37,20 @@ const FeedbackForum = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Feedback Forum</h2>
-            <form onSubmit={handleFeedbackSubmit} className="mb-6 flex gap-2 flex-wrap">
-                <input value={newFeedback} onChange={e => setNewFeedback(e.target.value)} required placeholder="Your feedback..." className="flex-1 border rounded px-2 py-1" />
-                <button type="submit" className="bg-blue-600 text-white px-4 py-1 rounded">Post</button>
+        <div className="rounded-xl bg-[#F5F7FA] border border-[#E5E7EB] p-6">
+            <h2 className="text-2xl font-extrabold mb-6 text-[#191E29] tracking-tight">Feedback Forum</h2>
+            <form onSubmit={handleFeedbackSubmit} className="mb-8 flex flex-col md:flex-row gap-3 md:gap-4">
+                <input value={newFeedback} onChange={e => setNewFeedback(e.target.value)} required placeholder="Your feedback..." className="flex-1 border-2 border-[#2CC295] rounded-lg px-3 py-2 bg-white text-[#191E29] font-medium focus:ring-2 focus:ring-[#2CC295]" />
+                <button type="submit" className="bg-[#2CC295] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#191E29] transition-colors">Post</button>
             </form>
-            <div className="space-y-4">
+            <div className="space-y-6">
                 {feedbacks.map(f => (
-                    <div key={f.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="font-semibold text-gray-800 mb-1">{f.user}</div>
-                        <div className="text-gray-600 text-sm mb-2">{f.content}</div>
+                    <div key={f.id} className="border border-[#E5E7EB] rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
+                        <div className="font-semibold text-[#191E29] mb-1 text-lg">{f.user}</div>
+                        <div className="text-[#696E79] text-sm mb-2">{f.content}</div>
                         <div className="ml-4 space-y-1">
                             {f.comments.map((c, i) => (
-                                <div key={i} className="text-xs text-gray-500">Comment: {c}</div>
+                                <div key={i} className="text-xs text-[#2CC295]">Comment: {c}</div>
                             ))}
                         </div>
                         <div className="flex gap-2 mt-2">
@@ -58,9 +58,9 @@ const FeedbackForum = () => {
                                 value={comment[f.id] || ''}
                                 onChange={e => handleCommentChange(f.id, e.target.value)}
                                 placeholder="Add a comment..."
-                                className="flex-1 border rounded px-2 py-1"
+                                className="flex-1 border-2 border-[#2CC295] rounded-lg px-3 py-2 bg-white text-[#191E29] font-medium focus:ring-2 focus:ring-[#2CC295]"
                             />
-                            <button type="button" onClick={() => handleCommentSubmit(f.id)} className="bg-green-600 text-white px-4 py-1 rounded">Comment</button>
+                            <button type="button" onClick={() => handleCommentSubmit(f.id)} className="bg-[#2CC295] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#191E29] transition-colors">Comment</button>
                         </div>
                     </div>
                 ))}
