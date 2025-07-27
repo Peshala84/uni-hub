@@ -2,6 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContexts';
 import Lecturer from './pages/lecturer/Lecturer';
+
+import Admin from './pages/admin/Admin'
+
 import Navbar from './components/users/Navbar';
 
 import Home from './pages/lecturer/Home';
@@ -10,6 +13,7 @@ import LecturerCourses from './pages/lecturer/Courses';
 import Notifications from './pages/lecturer/Notification';
 import ProfilePage from './pages/lecturer/Profile';
 import Student from './pages/student/Student';
+
 
 function App() {
   return (
@@ -20,7 +24,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/lecturer" replace />} />
             <Route path="/lecturer/*" element={<Lecturer />} />
+
             <Route path="/student/*" element={<Student />} />
+            <Route path="/admin/*" element={<Admin />} />
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/courses" element={<LecturerCourses />} />
