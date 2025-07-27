@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContexts';
 import { Send, MessageSquare, Clock, CheckCircle, AlertTriangle, BookOpen, User } from 'lucide-react';
+
 
 const mockQueries = [
   {

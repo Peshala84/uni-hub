@@ -5,8 +5,6 @@ import Lecturer from './pages/lecturer/Lecturer';
 
 import Admin from './pages/admin/Admin'
 
-import Navbar from './components/users/Navbar';
-
 import Home from './pages/lecturer/Home';
 import Login from './components/users/Login';
 import LecturerCourses from './pages/lecturer/Courses';
@@ -20,7 +18,6 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
-          <Navbar />
           <Routes>
             <Route path="/" element={<Navigate to="/lecturer" replace />} />
             <Route path="/lecturer/*" element={<Lecturer />} />
