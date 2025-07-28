@@ -33,6 +33,7 @@ const Navbar = () => {
         { path: '/student/dashboard', icon: Home, label: 'Dashboard' },
         { path: '/student/courses', icon: BookMarked, label: 'My Courses' },
         { path: '/student/appointments', icon: Calendar, label: 'Appointments' },
+        { path: '/student/peer-learning', icon: Users, label: 'Peer Learning' },
         { path: '/student/calendar', icon: Calendar, label: 'Calendar' },
         { path: '/student/announcements', icon: Bell, label: 'Announcements' },
         { path: '/student/profile', icon: User, label: 'Profile' }
@@ -71,8 +72,8 @@ const Navbar = () => {
                 <Link
                   to="/"
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath('/')
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    ? 'bg-blue-100 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                     }`}
                 >
                   <Home className="w-4 h-4" />
@@ -81,8 +82,8 @@ const Navbar = () => {
                 <Link
                   to="/lecturer/login"
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath('/lecturer/login')
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    ? 'bg-blue-100 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                     }`}
                 >
                   <LogIn className="w-4 h-4" />
@@ -98,8 +99,8 @@ const Navbar = () => {
                       key={item.path}
                       to={item.path}
                       className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath(item.path)
-                          ? 'bg-blue-100 text-blue-700 font-medium'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                        ? 'bg-blue-100 text-blue-700 font-medium'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                         }`}
                     >
                       <IconComponent className="w-4 h-4" />
@@ -136,8 +137,8 @@ const Navbar = () => {
                     to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath('/')
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-blue-100 text-blue-700 font-medium'
+                      : 'text-gray-700 hover:bg-gray-100'
                       }`}
                   >
                     <Home className="w-4 h-4" />
@@ -147,8 +148,8 @@ const Navbar = () => {
                     to="/lecturer/login"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath('/lecturer/login')
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-blue-100 text-blue-700 font-medium'
+                      : 'text-gray-700 hover:bg-gray-100'
                       }`}
                   >
                     <LogIn className="w-4 h-4" />
@@ -165,8 +166,8 @@ const Navbar = () => {
                         to={item.path}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath(item.path)
-                            ? 'bg-blue-100 text-blue-700 font-medium'
-                            : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-blue-100 text-blue-700 font-medium'
+                          : 'text-gray-700 hover:bg-gray-100'
                           }`}
                       >
                         <IconComponent className="w-4 h-4" />
