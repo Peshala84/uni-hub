@@ -1,55 +1,62 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/contexts/AuthContexts.js
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [userRole, setUserRole] = useState(null); // 'student' or 'lecturer'
+  const [userRole, setUserRole] = useState(null);
+  const [userId, setUserId] = useState(null);
 
-  const login = (credentials, role = 'lecturer') => {
-    // Mock login - in real app, this would validate with backend
-    setIsLoggedIn(true);
-    setUserRole(role);
-    
-    if (role === 'lecturer') {
-      setUserData({
-        id: 1,
-        name: 'Dr. Sarah Johnson',
-        email: 'sarah.johnson@university.edu',
-        department: 'Computer Science',
-        phone: '+1 (555) 123-4567',
-        office: 'CS Building, Room 301'
-      });
-    } else if (role === 'student') {
-      setUserData({
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@student.university.edu',
-        studentId: 'STU2024001',
-        year: '3rd Year',
-        department: 'Computer Science'
-      });
+  useEffect(() => {
+    // On app load, try to load token from localStorage and initialize auth state
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setIsLoggedIn(true);
+        setUserRole(decoded.role.toLowerCase());
+        setUserId(decoded.userId);
+      } catch (err) {
+        // Invalid token - clear
+        console.error('Invalid token:', err);
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        setUserRole(null);
+        setUserId(null);
+      }
+    }
+  }, []);
+
+  const login = (token) => {
+    localStorage.setItem('token', token);
+    try {
+      const decoded = jwtDecode(token);
+      setIsLoggedIn(true);
+      setUserRole(decoded.role.toLowerCase());
+      setUserId(decoded.userId);
+    } catch (err) {
+      console.error('Login failed: invalid token', err);
+      setIsLoggedIn(false);
+      setUserRole(null);
+      setUserId(null);
+      localStorage.removeItem('token');
     }
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setIsLoggedIn(false);
-    setUserData(null);
     setUserRole(null);
+    setUserId(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userData, userRole, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userRole, userId, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);
