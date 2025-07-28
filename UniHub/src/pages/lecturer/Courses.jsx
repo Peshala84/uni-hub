@@ -9,6 +9,7 @@ const Courses = () => {
   const [showForm, setShowForm] = useState(false);
   const { userData } = useAuth();
 
+
   // Feedback state
   const [feedbacks, setFeedbacks] = useState([]);
   const [isLoadingFeedback, setIsLoadingFeedback] = useState(false);
@@ -39,6 +40,7 @@ const Courses = () => {
     link: '',
     attachment: null // Will store the actual file object
   });
+
 
   // Form states for assignment
   const [assignmentForm, setAssignmentForm] = useState({
@@ -199,6 +201,7 @@ const Courses = () => {
     }
   }, [activeTab, userData]);
 
+
   // Fetch assignments when component mounts or when activeTab changes to assignments
   useEffect(() => {
     if (activeTab === 'assignments') {
@@ -213,12 +216,14 @@ const Courses = () => {
     }
   }, [activeTab, userData]);
 
+
   const handleAnnouncementInputChange = (field, value) => {
     setAnnouncementForm(prev => ({
       ...prev,
       [field]: value
     }));
   };
+
 
   const handleAssignmentInputChange = (field, value) => {
     setAssignmentForm(prev => ({
@@ -240,10 +245,12 @@ const Courses = () => {
     const file = e.target.files[0];
     const formType = e.target.getAttribute('data-form-type'); // To distinguish between announcement, assignment, and resource forms
     
+
     if (file) {
       // Check file type (images and PDFs only)
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
       if (allowedTypes.includes(file.type)) {
+
         if (formType === 'assignment') {
           setAssignmentForm(prev => ({
             ...prev,
@@ -260,6 +267,7 @@ const Courses = () => {
             attachment: file
           }));
         }
+
       } else {
         setSubmitMessage({ type: 'error', text: 'Please select only image files (JPEG, PNG, GIF) or PDF files.' });
         e.target.value = ''; // Clear the file input
@@ -324,8 +332,10 @@ const Courses = () => {
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput) fileInput.value = '';
 
+
       // Refresh announcements list
       fetchAnnouncements();
+
 
       // Hide form after successful submission
       setTimeout(() => {
@@ -363,6 +373,7 @@ const Courses = () => {
       setIsSubmitting(false);
     }
   };
+
 
 
 
@@ -739,6 +750,7 @@ const Courses = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Course Announcements</h3>
+
               <div className="flex space-x-3">
                 <button
                   onClick={fetchAnnouncements}
@@ -770,6 +782,7 @@ const Courses = () => {
                   <span>Add Announcement</span>
                 </button>
               </div>
+
             </div>
 
             {showForm && (
@@ -810,6 +823,7 @@ const Courses = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       placeholder="Enter announcement content"
                       disabled={isSubmitting}
+
                     />
                   </div>
                   <div>
@@ -824,12 +838,15 @@ const Courses = () => {
                     />
                   </div>
                   <div>
+
                     <label className="block mb-2 text-sm font-medium text-gray-700">Attachment (Optional)</label>
                     <div className="space-y-2">
                       <input
                         type="file"
                         name="attachment"
+
                         data-form-type="announcement"
+
                         onChange={handleFileChange}
                       />
                       <p className="text-xs text-gray-500">
@@ -915,6 +932,7 @@ const Courses = () => {
             )}
 
             {/* Announcements List */}
+
             <div className="space-y-4">
               {announcements.map((announcement) => (
                 <div 
@@ -1083,6 +1101,7 @@ const Courses = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
+
                       <label className="block mb-2 text-sm font-medium text-gray-700">
                         Course ID <span className="text-red-500">*</span>
                       </label>
@@ -1090,12 +1109,14 @@ const Courses = () => {
                         type="text"
                         value={assignmentForm.course_id}
                         onChange={(e) => handleAssignmentInputChange('course_id', e.target.value)}
+
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         placeholder="Enter course ID (e.g., CS301, MATH201)"
                         disabled={isSubmitting}
                       />
                     </div>
                     <div>
+
                       <label className="block mb-2 text-sm font-medium text-gray-700">
                         Due Date <span className="text-red-500">*</span>
                       </label>
@@ -1103,12 +1124,14 @@ const Courses = () => {
                         type="date"
                         value={assignmentForm.due_date}
                         onChange={(e) => handleAssignmentInputChange('due_date', e.target.value)}
+
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         disabled={isSubmitting}
                       />
                     </div>
                   </div>
                   <div>
+
                     <label className="block mb-2 text-sm font-medium text-gray-700">
                       Assignment Title <span className="text-red-500">*</span>
                     </label>
@@ -1125,6 +1148,7 @@ const Courses = () => {
                     <label className="block mb-2 text-sm font-medium text-gray-700">
                       Instructions/Description <span className="text-red-500">*</span>
                     </label>
+
                     <textarea
                       rows={4}
                       value={assignmentForm.description}
@@ -1177,6 +1201,7 @@ const Courses = () => {
                       {isSubmitting ? 'Creating...' : 'Create Assignment'}
                     </button>
                     <button
+
                       onClick={() => {
                         setShowForm(false);
                         setAssignmentForm({ course_id: '', title: '', description: '', due_date: '', attachment: null });
@@ -1187,6 +1212,7 @@ const Courses = () => {
                       }}
                       disabled={isSubmitting}
                       className="px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+
                     >
                       Cancel
                     </button>
@@ -1402,6 +1428,7 @@ const Courses = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
+
                       <label className="block mb-2 text-sm font-medium text-gray-700">
                         Course ID <span className="text-red-500">*</span>
                       </label>
@@ -1409,6 +1436,7 @@ const Courses = () => {
                         type="text"
                         value={resourceForm.course_id}
                         onChange={(e) => handleResourceInputChange('course_id', e.target.value)}
+
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         placeholder="Enter course ID (e.g., CS301, MATH201)"
                         disabled={isSubmitting}
@@ -1429,6 +1457,7 @@ const Courses = () => {
                     </div>
                   </div>
                   <div>
+
                     <label className="block mb-2 text-sm font-medium text-gray-700">Attachment (Optional)</label>
                     <div className="space-y-2">
                       <input
@@ -1461,6 +1490,7 @@ const Courses = () => {
                         </div>
                       )}
                     </div>
+
                   </div>
                   <div className="flex space-x-3">
                     <button
@@ -1471,6 +1501,7 @@ const Courses = () => {
                       {isSubmitting ? 'Uploading...' : 'Upload Resource'}
                     </button>
                     <button
+
                       onClick={() => {
                         setShowForm(false);
                         setResourceForm({ course_id: '', file_name: '', attachment: null });
@@ -1481,6 +1512,7 @@ const Courses = () => {
                       }}
                       disabled={isSubmitting}
                       className="px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+
                     >
                       Cancel
                     </button>
@@ -1617,6 +1649,7 @@ const Courses = () => {
       case 'feedback':
         return (
           <div className="space-y-6">
+
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Student Feedback</h3>
               <button
@@ -1691,6 +1724,7 @@ const Courses = () => {
                       </div>
                       <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">
                         Student ID: {feedback.student_id || 'N/A'}
+
                       </span>
                     </div>
                     
@@ -1780,6 +1814,7 @@ const Courses = () => {
                     setActiveTab(tab.id);
                     setShowForm(false);
                     setAnnouncementForm({ course_id: '', content: '', link: '', attachment: null });
+
                     setAssignmentForm({ course_id: '', title: '', description: '', due_date: '', attachment: null });
                     setResourceForm({ course_id: '', file_name: '', attachment: null });
                     setEditingAnnouncement(null);
@@ -1788,6 +1823,7 @@ const Courses = () => {
                     // Clear file inputs
                     const fileInputs = document.querySelectorAll('input[type="file"]');
                     fileInputs.forEach(input => input.value = '');
+
                   }}
                   className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.id
                     ? `border-green-500 ${tab.color} bg-blue-50`
