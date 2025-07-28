@@ -19,6 +19,16 @@ const Courses = () => {
   const [isLoadingAnnouncements, setIsLoadingAnnouncements] = useState(false);
   const [announcementError, setAnnouncementError] = useState('');
 
+  // Assignments state
+  const [assignments, setAssignments] = useState([]);
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(false);
+  const [assignmentError, setAssignmentError] = useState('');
+
+  // Resources state
+  const [resources, setResources] = useState([]);
+  const [isLoadingResources, setIsLoadingResources] = useState(false);
+  const [resourceError, setResourceError] = useState('');
+
   // Debug log to check userData
   console.log('Current userData:', userData);
 
@@ -113,6 +123,68 @@ const Courses = () => {
     }
   };
 
+  // Function to fetch assignments data
+  const fetchAssignments = async () => {
+    setIsLoadingAssignments(true);
+    setAssignmentError('');
+
+    try {
+      // Use userData.id with fallback to 1 for development/testing
+      const lecturerId = userData?.id || 1;
+      
+      console.log('Fetching assignments for lecturer ID:', lecturerId);
+      
+      const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/assignments`);
+      
+      console.log('Assignments response:', response.data);
+      setAssignments(response.data);
+      
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+      
+      if (error.response) {
+        setAssignmentError(error.response.data?.message || 'Failed to fetch assignments');
+      } else if (error.request) {
+        setAssignmentError('Cannot connect to server. Please ensure the backend is running on port 8086.');
+      } else {
+        setAssignmentError('An error occurred while fetching assignments.');
+      }
+    } finally {
+      setIsLoadingAssignments(false);
+    }
+  };
+
+  // Function to fetch resources data
+  const fetchResources = async () => {
+    setIsLoadingResources(true);
+    setResourceError('');
+
+    try {
+      // Use userData.id with fallback to 1 for development/testing
+      const lecturerId = userData?.id || 1;
+      
+      console.log('Fetching resources for lecturer ID:', lecturerId);
+      
+      const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/resources`);
+      
+      console.log('Resources response:', response.data);
+      setResources(response.data);
+      
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+      
+      if (error.response) {
+        setResourceError(error.response.data?.message || 'Failed to fetch resources');
+      } else if (error.request) {
+        setResourceError('Cannot connect to server. Please ensure the backend is running on port 8086.');
+      } else {
+        setResourceError('An error occurred while fetching resources.');
+      }
+    } finally {
+      setIsLoadingResources(false);
+    }
+  };
+
   // Fetch feedback when component mounts or when activeTab changes to feedback
   useEffect(() => {
     if (activeTab === 'feedback') {
@@ -124,6 +196,20 @@ const Courses = () => {
   useEffect(() => {
     if (activeTab === 'announcements') {
       fetchAnnouncements();
+    }
+  }, [activeTab, userData]);
+
+  // Fetch assignments when component mounts or when activeTab changes to assignments
+  useEffect(() => {
+    if (activeTab === 'assignments') {
+      fetchAssignments();
+    }
+  }, [activeTab, userData]);
+
+  // Fetch resources when component mounts or when activeTab changes to resources
+  useEffect(() => {
+    if (activeTab === 'resources') {
+      fetchResources();
     }
   }, [activeTab, userData]);
 
@@ -337,6 +423,119 @@ const Courses = () => {
     }
   };
 
+  const handleDeleteAssignment = async (assignmentId) => {
+    if (!window.confirm('Are you sure you want to delete this assignment? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage({ type: '', text: '' });
+
+    try {
+      // Use userData.id with fallback to 1 for development/testing
+      const lecturerId = userData?.id || 1;
+
+      console.log('Deleting assignment:', assignmentId);
+
+      const response = await axios.delete(
+        `http://localhost:8086/api/v1/lecturer/${lecturerId}/assignment/${assignmentId}`
+      );
+
+      console.log('Delete response status:', response.status);
+
+      setSubmitMessage({ type: 'success', text: 'Assignment deleted successfully!' });
+
+      // Refresh assignments list
+      fetchAssignments();
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSubmitMessage({ type: '', text: '' });
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setSubmitMessage({
+          type: 'error',
+          text: error.response.data?.message || error.response.data || 'Failed to delete assignment'
+        });
+      } else if (error.request) {
+        console.error('Network error:', error.request);
+        setSubmitMessage({
+          type: 'error',
+          text: 'Cannot connect to server. Please ensure the backend is running on port 8086.'
+        });
+      } else {
+        console.error('Request error:', error.message);
+        setSubmitMessage({
+          type: 'error',
+          text: 'An error occurred while deleting the assignment.'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteResource = async (resourceId) => {
+    if (!window.confirm('Are you sure you want to delete this resource? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage({ type: '', text: '' });
+
+    try {
+      const lecturerId = userData?.id || 1;
+
+      console.log('Deleting resource:', resourceId);
+
+      const response = await axios.delete(
+        `http://localhost:8086/api/v1/lecturer/${lecturerId}/resource/${resourceId}`
+      );
+
+      console.log('Delete response status:', response.status);
+
+      setSubmitMessage({ type: 'success', text: 'Resource deleted successfully!' });
+
+      // Refresh resources list
+      fetchResources();
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSubmitMessage({ type: '', text: '' });
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setSubmitMessage({
+          type: 'error',
+          text: error.response.data?.message || error.response.data || 'Failed to delete resource'
+        });
+      } else if (error.request) {
+        console.error('Network error:', error.request);
+        setSubmitMessage({
+          type: 'error',
+          text: 'Cannot connect to server. Please ensure the backend is running on port 8086.'
+        });
+      } else {
+        console.error('Request error:', error.message);
+        setSubmitMessage({
+          type: 'error',
+          text: 'An error occurred while deleting the resource.'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
 
 
   const handleAssignmentSubmit = async () => {
@@ -400,6 +599,9 @@ const Courses = () => {
       // Clear file input
       const fileInput = document.querySelector('input[type="file"][data-form-type="assignment"]');
       if (fileInput) fileInput.value = '';
+
+      // Refresh assignments list
+      fetchAssignments();
 
       // Hide form after successful submission
       setTimeout(() => {
@@ -486,6 +688,9 @@ const Courses = () => {
       const fileInput = document.querySelector('input[type="file"][data-form-type="resource"]');
       if (fileInput) fileInput.value = '';
 
+      // Refresh resources list
+      fetchResources();
+
       // Hide form after successful submission
       setTimeout(() => {
         setShowForm(false);
@@ -542,7 +747,7 @@ const Courses = () => {
                 >
                   {isLoadingAnnouncements ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                       <span>Loading...</span>
                     </>
                   ) : (
@@ -692,7 +897,7 @@ const Courses = () => {
             {isLoadingAnnouncements && announcements.length === 0 && (
               <div className="flex items-center justify-center p-8">
                 <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                   <span className="text-gray-600">Loading announcements...</span>
                 </div>
               </div>
@@ -714,11 +919,11 @@ const Courses = () => {
               {announcements.map((announcement) => (
                 <div 
                   key={announcement.announcement_id} 
-                  className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex items-center mb-2 space-x-2">
                         <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
                           Course: {announcement.course_id}
                         </span>
@@ -727,7 +932,7 @@ const Courses = () => {
                         </span>
                       </div>
                       <div className="mb-3">
-                        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                        <p className="leading-relaxed text-gray-800 whitespace-pre-wrap">
                           {announcement.content}
                         </p>
                       </div>
@@ -752,7 +957,7 @@ const Courses = () => {
                       {/* Attachment */}
                       {announcement.attachment && (
                         <div className="mb-3">
-                          <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg border">
+                          <div className="flex items-center p-2 space-x-2 border rounded-lg bg-gray-50">
                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                             </svg>
@@ -764,7 +969,7 @@ const Courses = () => {
                                 // You can implement download functionality here
                                 console.log('Download attachment:', announcement.attachment);
                               }}
-                              className="text-blue-600 hover:text-blue-800 text-sm"
+                              className="text-sm text-blue-600 hover:text-blue-800"
                             >
                               Download
                             </button>
@@ -774,11 +979,11 @@ const Courses = () => {
                     </div>
                     
                     {/* Actions */}
-                    <div className="flex items-center space-x-2 ml-4">
+                    <div className="flex items-center ml-4 space-x-2">
                       <button
                         onClick={() => handleDeleteAnnouncement(announcement.announcement_id)}
                         disabled={isSubmitting}
-                        className="p-1 text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 text-gray-500 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -789,14 +994,14 @@ const Courses = () => {
                   </div>
                   
                   {/* Timestamp */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-3 text-xs text-gray-500 border-t border-gray-100">
                     <span>
                       {announcement.created_at 
                         ? `Posted on ${new Date(announcement.created_at).toLocaleDateString()} at ${new Date(announcement.created_at).toLocaleTimeString()}`
                         : 'Recently posted'
                       }
                     </span>
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                    <span className="px-2 py-1 text-green-800 bg-green-100 rounded-full">
                       Published
                     </span>
                   </div>
@@ -809,7 +1014,7 @@ const Courses = () => {
               <div className="space-y-4">
                 {[1, 2, 3].map((item) => (
                   <div key={item} className="p-4 bg-white border border-gray-200 rounded-lg opacity-50">
-                    <div className="flex items-center space-x-2 mb-2">
+                    <div className="flex items-center mb-2 space-x-2">
                       <span className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">
                         Sample Data
                       </span>
@@ -829,13 +1034,37 @@ const Courses = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Assignments</h3>
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Assignment</span>
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={fetchAssignments}
+                  disabled={isLoadingAssignments}
+                  className="flex items-center px-4 py-2 space-x-2 text-blue-600 transition-colors border border-blue-300 rounded-lg hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoadingAssignments ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>Refresh</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowForm(!showForm);
+                    setSubmitMessage({ type: '', text: '' });
+                  }}
+                  className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Assignment</span>
+                </button>
+              </div>
             </div>
 
             {showForm && (
@@ -966,17 +1195,153 @@ const Courses = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <h4 className="mb-2 font-medium text-gray-800">Assignment {item}</h4>
-                  <p className="mb-3 text-sm text-gray-600">Due: Jan {15 + item}, 2024</p>
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">
-                      {item % 2 === 0 ? 'Active' : 'Draft'}
-                    </span>
-                    <span className="text-xs text-gray-500">{20 - item * 2} submissions</span>
+            {/* Error Message */}
+            {assignmentError && (
+              <div className="p-4 text-red-800 bg-red-100 border border-red-200 rounded-lg">
+                <p className="font-medium">Error loading assignments:</p>
+                <p>{assignmentError}</p>
+              </div>
+            )}
+
+            {/* Loading State */}
+            {isLoadingAssignments && assignments.length === 0 && (
+              <div className="flex items-center justify-center p-8">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                  <span className="text-gray-600">Loading assignments...</span>
+                </div>
+              </div>
+            )}
+
+            {/* No Assignments Message */}
+            {!isLoadingAssignments && assignments.length === 0 && !assignmentError && (
+              <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                  <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <h4 className="mb-2 text-lg font-medium text-gray-600">No assignments yet</h4>
+                  <p className="text-gray-500">You haven't created any assignments. Click "Add Assignment" to get started.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Assignments List */}
+            <div className="space-y-4">
+              {assignments.map((assignment) => (
+                <div 
+                  key={assignment.assignment_id} 
+                  className="p-6 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center mb-3 space-x-2">
+                        <span className="px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full">
+                          Course: {assignment.course_id}
+                        </span>
+                        <span className="px-3 py-1 text-sm font-medium text-purple-700 bg-purple-100 rounded-full">
+                          ID: {assignment.assignment_id}
+                        </span>
+                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                          new Date(assignment.date) < new Date() 
+                            ? 'text-red-700 bg-red-100' 
+                            : 'text-green-700 bg-green-100'
+                        }`}>
+                          Due: {new Date(assignment.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      
+                      <h4 className="mb-3 text-xl font-semibold text-gray-800">
+                        {assignment.title}
+                      </h4>
+                      
+                      <div className="mb-4">
+                        <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
+                          {assignment.description}
+                        </p>
+                      </div>
+                      
+                      {/* Attachment */}
+                      {assignment.attachment && (
+                        <div className="mb-4">
+                          <div className="flex items-center p-3 space-x-3 border border-gray-200 rounded-lg bg-gray-50">
+                            <div className="flex items-center space-x-2">
+                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                              </svg>
+                              <span className="text-sm font-medium text-gray-700">
+                                Attachment: {assignment.attachment}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => {
+                                // You can implement download functionality here
+                                console.log('Download attachment:', assignment.attachment);
+                              }}
+                              className="px-3 py-1 text-sm text-blue-600 transition-colors rounded hover:text-blue-800 hover:bg-blue-50"
+                            >
+                              Download
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Assignment Stats */}
+                      {/* <div className="grid grid-cols-2 gap-4 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-gray-800">
+                            {Math.floor(Math.random() * 25) + 5} 
+                          </div>
+                          <div className="text-xs text-gray-600">Submissions</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-gray-800">
+                            {Math.ceil((new Date(assignment.date) - new Date()) / (1000 * 60 * 60 * 24))} days
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {new Date(assignment.date) < new Date() ? 'Overdue' : 'Remaining'}
+                          </div>
+                        </div>
+                      </div> */}
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center ml-6 space-x-2">
+                      <button
+                        onClick={() => {
+                          // You can implement edit functionality here
+                          console.log('Edit assignment:', assignment.assignment_id);
+                        }}
+                        className="p-2 text-gray-500 transition-colors hover:text-blue-600"
+                        title="Edit"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAssignment(assignment.assignment_id)}
+                        disabled={isSubmitting}
+                        className="p-2 text-gray-500 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Delete"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
+                  
+                  {/* Timestamp */}
+                  {/* <div className="flex items-center justify-between pt-4 text-xs text-gray-500 border-t border-gray-100">
+                    <span>
+                      {assignment.created_at 
+                        ? `Created on ${new Date(assignment.created_at).toLocaleDateString()} at ${new Date(assignment.created_at).toLocaleTimeString()}`
+                        : 'Recently created'
+                      }
+                    </span>
+                    <span className="px-2 py-1 text-blue-800 bg-blue-100 rounded-full">
+                      Active
+                    </span>
+                  </div> */}
                 </div>
               ))}
             </div>
@@ -988,13 +1353,37 @@ const Courses = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-800">Learning Resources</h3>
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Resource</span>
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={fetchResources}
+                  disabled={isLoadingResources}
+                  className="flex items-center px-4 py-2 space-x-2 text-blue-600 transition-colors border border-blue-300 rounded-lg hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoadingResources ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>Refresh</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowForm(!showForm);
+                    setSubmitMessage({ type: '', text: '' });
+                  }}
+                  className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Resource</span>
+                </button>
+              </div>
             </div>
 
             {showForm && (
@@ -1100,21 +1489,120 @@ const Courses = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {[
-                { title: 'Algorithm Analysis Notes', type: 'PDF', size: '2.5 MB' },
-                { title: 'Data Structures Video Series', type: 'Video', duration: '45 min' },
-                { title: 'Programming Best Practices', type: 'Link', domain: 'external' },
-                { title: 'Midterm Study Guide', type: 'PDF', size: '1.8 MB' }
-              ].map((resource, index) => (
-                <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <h4 className="mb-2 font-medium text-gray-800">{resource.title}</h4>
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">
-                      {resource.type}
+            {/* Error Message */}
+            {resourceError && (
+              <div className="p-4 text-red-800 bg-red-100 border border-red-200 rounded-lg">
+                <p className="font-medium">Error loading resources:</p>
+                <p>{resourceError}</p>
+              </div>
+            )}
+
+            {/* Loading State */}
+            {isLoadingResources && resources.length === 0 && (
+              <div className="flex items-center justify-center p-8">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                  <span className="text-gray-600">Loading resources...</span>
+                </div>
+              </div>
+            )}
+
+            {/* No Resources Message */}
+            {!isLoadingResources && resources.length === 0 && !resourceError && (
+              <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                  <BookMarked className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <h4 className="mb-2 text-lg font-medium text-gray-600">No resources yet</h4>
+                  <p className="text-gray-500">You haven't uploaded any learning resources. Click "Add Resource" to get started.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Resources List */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {resources.map((resource) => (
+                <div 
+                  key={resource.resource_id} 
+                  className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center mb-2 space-x-2">
+                        <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
+                          Course: {resource.course_id}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          ID: {resource.resource_id}
+                        </span>
+                      </div>
+                      
+                      <h4 className="mb-3 text-lg font-semibold text-gray-800">
+                        {resource.file_name}
+                      </h4>
+                      
+                      {/* Attachment */}
+                      {resource.attachment && (
+                        <div className="mb-3">
+                          <div className="flex items-center p-3 space-x-3 border border-gray-200 rounded-lg bg-gray-50">
+                            <div className="flex items-center space-x-2">
+                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                              </svg>
+                              <span className="text-sm font-medium text-gray-700">
+                                {resource.attachment}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => {
+                                // You can implement download functionality here
+                                console.log('Download attachment:', resource.attachment);
+                              }}
+                              className="px-3 py-1 text-sm text-blue-600 transition-colors rounded hover:text-blue-800 hover:bg-blue-50"
+                            >
+                              Download
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center ml-4 space-x-2">
+                      <button
+                        onClick={() => {
+                          // You can implement edit functionality here
+                          console.log('Edit resource:', resource.resource_id);
+                        }}
+                        className="p-1 text-gray-500 transition-colors hover:text-blue-600"
+                        title="Edit"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteResource(resource.resource_id)}
+                        disabled={isSubmitting}
+                        className="p-1 text-gray-500 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Delete"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Timestamp */}
+                  <div className="flex items-center justify-between pt-3 text-xs text-gray-500 border-t border-gray-100">
+                    <span>
+                      {resource.created_at 
+                        ? `Uploaded on ${new Date(resource.created_at).toLocaleDateString()} at ${new Date(resource.created_at).toLocaleTimeString()}`
+                        : 'Recently uploaded'
+                      }
                     </span>
-                    <span className="text-xs text-gray-500">
-                      {resource.size || resource.duration || resource.domain}
+                    <span className="px-2 py-1 text-green-800 bg-green-100 rounded-full">
+                      Available
                     </span>
                   </div>
                 </div>
@@ -1138,7 +1626,7 @@ const Courses = () => {
               >
                 {isLoadingFeedback ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
                     <span>Loading...</span>
                   </>
                 ) : (
@@ -1164,7 +1652,7 @@ const Courses = () => {
             {isLoadingFeedback && feedbacks.length === 0 && (
               <div className="flex items-center justify-center p-8">
                 <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                   <span className="text-gray-600">Loading feedback...</span>
                 </div>
               </div>
@@ -1185,7 +1673,7 @@ const Courses = () => {
             {feedbacks.length > 0 && (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {feedbacks.map((feedback, index) => (
-                  <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <div key={index} className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-1">
                         {[...Array(5)].map((_, i) => (
@@ -1207,7 +1695,7 @@ const Courses = () => {
                     </div>
                     
                     <div className="mb-3">
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-sm leading-relaxed text-gray-600">
                         "{feedback.review || 'No review provided'}"
                       </p>
                     </div>
@@ -1225,7 +1713,7 @@ const Courses = () => {
 
             {/* Feedback Statistics */}
             {feedbacks.length > 0 && (
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
                 <h4 className="mb-3 text-lg font-medium text-gray-800">Feedback Summary</h4>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div className="text-center">
