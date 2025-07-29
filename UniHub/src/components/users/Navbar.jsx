@@ -23,6 +23,7 @@ const Navbar = () => {
       return [
         { path: '/lecturer/home', icon: Home, label: 'Dashboard' },
         { path: '/lecturer/courses', icon: BookMarked, label: 'Courses' },
+        { path: '/lecturer/appointments', icon: Calendar, label: 'Appointments' },
         { path: '/lecturer/notifications', icon: Bell, label: 'Notifications' },
         { path: '/lecturer/profile', icon: User, label: 'Profile' }
       ];
