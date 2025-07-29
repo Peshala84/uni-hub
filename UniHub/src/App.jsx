@@ -11,6 +11,7 @@ import LecturerCourses from './pages/lecturer/Courses';
 import Notifications from './pages/lecturer/Notification';
 import ProfilePage from './pages/lecturer/Profile';
 import Student from './pages/student/Student';
+import Navbar from './components/users/Navbar';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
+          <Navbar/>
           <Routes>
             <Route path="/" element={<Navigate to="/lecturer" replace />} />
             <Route path="/lecturer/*" element={<Lecturer />} />
