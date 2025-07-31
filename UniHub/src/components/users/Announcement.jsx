@@ -1,155 +1,59 @@
-import React, { useState } from 'react';
-import { Calendar as CalendarIcon, User, ChevronRight, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, User, ChevronRight, X, Clock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContexts';
 import { useNavigate } from 'react-router-dom';
-
-const mockAnnouncements = {
-  student: [
-    {
-      id: 1,
-      title: 'Mid-term Examination Schedule Released',
-      content: 'The mid-term examination schedule for Fall 2024 has been published. Please check your course portals for specific dates and venues. All students are required to carry their university ID cards during examinations. Late arrivals will not be accommodated beyond 30 minutes of the scheduled start time.',
-      date: '2024-01-15',
-      author: 'Academic Office',
-      priority: 'high',
-      category: 'Academic',
-      targetAudience: 'student'
-    },
-    {
-      id: 2,
-      title: 'Library Extended Hours During Finals',
-      content: 'The university library will extend its operating hours during the final examination period. New hours: Monday-Friday 7:00 AM - 12:00 AM, Saturday-Sunday 9:00 AM - 10:00 PM. Additional study spaces have been arranged in the student center.',
-      date: '2024-01-12',
-      author: 'Library Services',
-      priority: 'medium',
-      category: 'Facilities',
-      targetAudience: 'student'
-    },
-    {
-      id: 3,
-      title: 'Course Registration Deadline Extended',
-      content: 'The deadline for course registration has been extended to January 20th, 2024. Students who have not completed their registration are advised to meet with their academic advisors immediately. Late registration fees may apply after this date.',
-      date: '2024-01-10',
-      author: 'Registrar Office',
-      priority: 'high',
-      category: 'Academic',
-      targetAudience: 'student'
-    },
-    {
-      id: 4,
-      title: 'Student Health Services Update',
-      content: 'Student Health Services will be offering free flu vaccinations throughout the month. Appointments can be scheduled through the student portal. The health center will also extend hours during exam period.',
-      date: '2024-01-08',
-      author: 'Health Services',
-      priority: 'low',
-      category: 'Health',
-      targetAudience: 'student'
-    }
-  ],
-  lecturer: [
-    {
-      id: 5,
-      title: 'Faculty Meeting - Curriculum Review',
-      content: 'All faculty members are required to attend the curriculum review meeting scheduled for January 25th, 2024, at 2:00 PM in the main conference hall. We will discuss updates to course materials and new teaching methodologies.',
-      date: '2024-01-15',
-      author: 'Dean Office',
-      priority: 'high',
-      category: 'Academic',
-      targetAudience: 'lecturer'
-    },
-    {
-      id: 6,
-      title: 'Research Grant Application Deadline',
-      content: 'Faculty members interested in applying for the Spring 2024 research grants must submit their applications by February 1st, 2024. All required documents and proposal guidelines are available on the faculty portal. Contact the research office for assistance.',
-      date: '2024-01-12',
-      author: 'Research Office',
-      priority: 'high',
-      category: 'Research',
-      targetAudience: 'lecturer'
-    },
-    {
-      id: 7,
-      title: 'New Learning Management System Training',
-      content: 'Training sessions for the new LMS will be conducted next week. All faculty members are encouraged to attend. Sessions will cover course setup, grading tools, and student communication features. Multiple time slots available.',
-      date: '2024-01-10',
-      author: 'IT Training Center',
-      priority: 'medium',
-      category: 'Technology',
-      targetAudience: 'lecturer'
-    },
-    {
-      id: 8,
-      title: 'Faculty Parking Permit Renewal',
-      content: 'Faculty parking permits for the Spring semester are now available for renewal. Please visit the campus security office with your faculty ID and vehicle registration. Early renewal discount available until January 31st.',
-      date: '2024-01-08',
-      author: 'Campus Security',
-      priority: 'low',
-      category: 'Administrative',
-      targetAudience: 'lecturer'
-    }
-  ],
-  general: [
-    {
-      id: 9,
-      title: 'Campus Wi-Fi Maintenance Scheduled',
-      content: 'Routine maintenance of the campus network infrastructure will take place this weekend. Users may experience intermittent connectivity issues between 2:00 AM - 6:00 AM on Saturday and Sunday. Please plan accordingly.',
-      date: '2024-01-08',
-      author: 'IT Services',
-      priority: 'low',
-      category: 'Technical',
-      targetAudience: 'general'
-    },
-    {
-      id: 10,
-      title: 'Campus Safety Drill Announcement',
-      content: 'A campus-wide emergency preparedness drill will be conducted on January 30th at 10:00 AM. All students, faculty, and staff are required to participate. Emergency procedures will be reviewed prior to the drill.',
-      date: '2024-01-05',
-      author: 'Safety Office',
-      priority: 'medium',
-      category: 'Safety',
-      targetAudience: 'general'
-    }
-  ]
-};
+import axios from 'axios';
 
 const Announcement = () => {
   const { isLoggedIn, userRole } = useAuth();
   const navigate = useNavigate();
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch site announcements from API
+  useEffect(() => {
+    const fetchSiteAnnouncements = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:8086/api/v1/lecturer/site/announcements');
+        setAnnouncements(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching announcements:', err);
+        setError('Failed to load announcements. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSiteAnnouncements();
+  }, []);
 
   // Get announcements based on user role
   const getAnnouncementsForRole = () => {
     if (!isLoggedIn) {
-      // Show general announcements for non-logged-in users
-      return [...mockAnnouncements.general].slice(0, 3);
-    }
-
-    let announcements = [];
-    
-    // Add role-specific announcements
-    if (userRole === 'student') {
-      announcements = [...mockAnnouncements.student];
-    } else if (userRole === 'lecturer') {
-      announcements = [...mockAnnouncements.lecturer];
+      // Show limited announcements for non-logged-in users
+      return announcements.slice(0, 3);
     }
     
-    // Add general announcements for all logged-in users
-    announcements = [...announcements, ...mockAnnouncements.general];
-    
-    // Sort by date (newest first)
-    return announcements.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+    // Sort by created_at date (newest first)
+    return announcements.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   };
 
   const filteredAnnouncements = getAnnouncementsForRole().filter(announcement => {
     if (selectedFilter === 'all') return true;
-    return announcement.category.toLowerCase() === selectedFilter.toLowerCase();
+    // You can add category filtering logic here if categories are added to the backend
+    return true;
   });
 
   const getUniqueCategories = () => {
-    const announcements = getAnnouncementsForRole();
-    const categories = [...new Set(announcements.map(a => a.category))];
-    return categories;
+    // For now, return empty array since categories aren't in the current API response
+    // You can modify this when categories are added to the backend
+    return [];
   };
 
   const handleAnnouncementClick = (announcement) => {
@@ -165,7 +69,7 @@ const Announcement = () => {
       case 'high': return 'bg-red-100 text-red-800 border-red-200';
       case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
 
@@ -177,31 +81,71 @@ const Announcement = () => {
     });
   };
 
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const formatDateTime = (dateTimeString) => {
+    return new Date(dateTimeString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="p-6 bg-white shadow-lg rounded-xl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">
-            {isLoggedIn ? 
-              (userRole === 'student' ? 'Student Announcements' : 
-               userRole === 'lecturer' ? 'Faculty Announcements' : 'Announcements') 
-              : 'Latest Announcements'
-            }
+            Site Announcements
           </h2>
-          {isLoggedIn && (
-            <p className="text-sm text-gray-500 mt-1">
-              {userRole === 'student' ? 'Important updates for students' : 
-               userRole === 'lecturer' ? 'Faculty notices and updates' : 'General announcements'}
-            </p>
-          )}
+          <p className="mt-1 text-sm text-gray-500">
+            {isLoggedIn 
+              ? 'Latest updates and important information'
+              : 'Click any item to login and view details'
+            }
+          </p>
         </div>
         {!isLoggedIn && (
           <p className="text-sm text-gray-500">Click any item to login and view details</p>
         )}
       </div>
 
-      {/* Filter Tabs (only show when logged in) */}
-      {isLoggedIn && (
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-b-2 border-blue-600 rounded-full animate-spin"></div>
+          <span className="ml-3 text-gray-600">Loading announcements...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            <p className="mb-4 text-red-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Filter Tabs (only show when logged in and has categories) */}
+      {isLoggedIn && !loading && !error && getUniqueCategories().length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setSelectedFilter('all')}
@@ -229,109 +173,125 @@ const Announcement = () => {
         </div>
       )}
 
-      <div className="space-y-4">
-        {filteredAnnouncements.map((announcement) => (
-          <div
-            key={announcement.id}
-            onClick={() => handleAnnouncementClick(announcement)}
-            className="group border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-blue-300 transition-all duration-200 cursor-pointer"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(announcement.priority)}`}>
-                    {announcement.priority.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                    {announcement.category}
-                  </span>
-                  {isLoggedIn && announcement.targetAudience && (
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      announcement.targetAudience === 'student' ? 'bg-blue-100 text-blue-700' :
-                      announcement.targetAudience === 'lecturer' ? 'bg-purple-100 text-purple-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
-                      {announcement.targetAudience === 'general' ? 'All' : announcement.targetAudience}
-                    </span>
-                  )}
-                </div>
-                
-                <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-2">
-                  {announcement.title}
-                </h3>
-                
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {isLoggedIn ? announcement.content.substring(0, 120) + '...' : 'Login to view full content...'}
-                </p>
-                
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <CalendarIcon className="h-3 w-3" />
-                    <span>{formatDate(announcement.date)}</span>
+      {/* Announcements List */}
+      {!loading && !error && (
+        <div className="space-y-4">
+          {filteredAnnouncements.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-lg text-gray-500">No announcements available at the moment.</p>
+            </div>
+          ) : (
+            filteredAnnouncements.map((announcement) => (
+              <div
+                key={announcement.announcement_id}
+                onClick={() => handleAnnouncementClick(announcement)}
+                className="p-4 transition-all duration-200 border border-gray-200 rounded-lg cursor-pointer group hover:shadow-md hover:border-blue-300"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2 space-x-3">
+                      <span className="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 border border-blue-200 rounded-full">
+                        ANNOUNCEMENT
+                      </span>
+                      {announcement.date && (
+                        <span className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">
+                          {formatDate(announcement.date)}
+                        </span>
+                      )}
+                      {announcement.time && (
+                        <span className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">
+                          {formatTime(announcement.time)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <h3 className="mb-2 font-semibold text-gray-800 transition-colors group-hover:text-blue-600">
+                      {announcement.topic}
+                    </h3>
+                    
+                    <p className="mb-3 text-sm text-gray-600 line-clamp-2">
+                      {isLoggedIn 
+                        ? (announcement.description?.length > 120 
+                           ? announcement.description.substring(0, 120) + '...' 
+                           : announcement.description)
+                        : 'Login to view full content...'
+                      }
+                    </p>
+                    
+                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      {announcement.created_at && (
+                        <div className="flex items-center space-x-1">
+                          <CalendarIcon className="w-3 h-3" />
+                          <span>Created: {formatDateTime(announcement.created_at)}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-1">
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          ID: {announcement.announcement_id}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <User className="h-3 w-3" />
-                    <span>{announcement.author}</span>
-                  </div>
+                  
+                  <ChevronRight className="w-5 h-5 ml-4 text-gray-400 transition-colors group-hover:text-blue-600" />
                 </div>
               </div>
-              
-              <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors ml-4" />
-            </div>
-          </div>
-        ))}
-      </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Detailed Announcement Modal */}
       {selectedAnnouncement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getPriorityColor(selectedAnnouncement.priority)}`}>
-                    {selectedAnnouncement.priority.toUpperCase()}
+                  <span className="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 border border-blue-200 rounded-full">
+                    ANNOUNCEMENT
                   </span>
-                  <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    {selectedAnnouncement.category}
+                  <span className="px-3 py-1 text-sm text-green-700 bg-green-100 rounded-full">
+                    ID: {selectedAnnouncement.announcement_id}
                   </span>
-                  {selectedAnnouncement.targetAudience && (
-                    <span className={`text-sm px-3 py-1 rounded-full ${
-                      selectedAnnouncement.targetAudience === 'student' ? 'bg-blue-100 text-blue-700' :
-                      selectedAnnouncement.targetAudience === 'lecturer' ? 'bg-purple-100 text-purple-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
-                      {selectedAnnouncement.targetAudience === 'general' ? 'All Users' : 
-                       selectedAnnouncement.targetAudience === 'student' ? 'Students' : 'Faculty'}
-                    </span>
-                  )}
                 </div>
                 <button
                   onClick={() => setSelectedAnnouncement(null)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 transition-colors rounded-full hover:bg-gray-100"
                 >
-                  <X className="h-5 w-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
               
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                {selectedAnnouncement.title}
+              <h2 className="mb-4 text-2xl font-bold text-gray-800">
+                {selectedAnnouncement.topic}
               </h2>
               
-              <div className="flex items-center space-x-4 text-sm text-gray-500 mb-6">
-                <div className="flex items-center space-x-1">
-                  <CalendarIcon className="h-4 w-4" />
-                  <span>{formatDate(selectedAnnouncement.date)}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <User className="h-4 w-4" />
-                  <span>{selectedAnnouncement.author}</span>
-                </div>
+              <div className="grid grid-cols-1 gap-4 mb-6 text-sm text-gray-500 md:grid-cols-2">
+                {selectedAnnouncement.date && (
+                  <div className="flex items-center space-x-2">
+                    <CalendarIcon className="w-4 h-4" />
+                    <span>Date: {formatDate(selectedAnnouncement.date)}</span>
+                  </div>
+                )}
+                {selectedAnnouncement.time && (
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Time: {formatTime(selectedAnnouncement.time)}</span>
+                  </div>
+                )}
+                {selectedAnnouncement.created_at && (
+                  <div className="flex items-center space-x-2 md:col-span-2">
+                    <User className="w-4 h-4" />
+                    <span>Created: {formatDateTime(selectedAnnouncement.created_at)}</span>
+                  </div>
+                )}
               </div>
               
               <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {selectedAnnouncement.content}
+                <h3 className="mb-3 text-lg font-semibold text-gray-800">Description</h3>
+                <p className="leading-relaxed text-gray-700 whitespace-pre-line">
+                  {selectedAnnouncement.description}
                 </p>
               </div>
             </div>

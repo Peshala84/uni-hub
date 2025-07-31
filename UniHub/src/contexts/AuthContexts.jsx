@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+
   const login = (token) => {
     localStorage.setItem('token', token);
     try {
@@ -42,6 +43,7 @@ export const AuthProvider = ({ children }) => {
       setUserRole(null);
       setUserId(null);
       localStorage.removeItem('token');
+
     }
   };
 
