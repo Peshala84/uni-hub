@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContexts';
 import Lecturer from './pages/lecturer/Lecturer';
 
 import Admin from './pages/admin/Admin'
+import ProtectedRoute from './components/users/ProtectedRoute';
+import Navbar from './components/users/Navbar';
 
 import ProtectedRoute from './components/users/ProtectedRoute';
 import Navbar from './components/users/Navbar';
@@ -26,6 +28,7 @@ function App() {
           <Navbar/>
           <Routes>
 
+
             <Route path="/student/*" element={<Student />} />
 
             <Route path="/" element={<Navigate to="/lecturer" replace />} />
@@ -46,6 +49,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
 
 
             <Route path="/" element={<Home />} />

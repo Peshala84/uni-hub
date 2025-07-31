@@ -46,6 +46,7 @@ const Navbar = () => {
     if (normalizedUserRole === 'lecturer') {
       return [
 
+
         { path: `/lecturer/${userId}/home`, icon: Home, label: 'Dashboard' },
         { path: `/lecturer/${userId}/courses`, icon: BookMarked, label: 'Courses' },
         { path: `/lecturer/${userId}appointments`, icon: Calendar, label: 'Appointments' },
@@ -58,6 +59,7 @@ const Navbar = () => {
     if (normalizedUserRole === 'student') {
       return [
 
+
         { path: `/student/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
         { path: `/student/${userId}/courses`, icon: BookMarked, label: 'My Courses' },
         { path: `/student/${userId}/appointments`, icon: Calendar, label: 'Appointments' },
@@ -65,6 +67,7 @@ const Navbar = () => {
         { path: `/student/${userId}/queries`, icon: MessageSquare, label: 'Queries' },
         { path: `/student/${userId}/announcements`, icon: Bell, label: 'Announcements' },
         { path: `/student/${userId}/profile`, icon: User, label: 'Profile' },
+
 
       ];
     }
@@ -109,9 +112,11 @@ const Navbar = () => {
                 <Link
                   to="/"
 
+
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                     isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                   }`}
+
 
                 >
                   <Home className="w-4 h-4" />
@@ -138,9 +143,11 @@ const Navbar = () => {
                       key={item.path}
                       to={item.path}
 
+
                       className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                         isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                       }`}
+
 
                     >
                       <IconComponent className="w-4 h-4" />
@@ -178,9 +185,11 @@ const Navbar = () => {
                     to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
 
+
                     className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
                     }`}
+
 
                   >
                     <Home className="w-4 h-4" />
@@ -190,9 +199,11 @@ const Navbar = () => {
                     to="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
 
+
                     className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
                     }`}
+
 
                   >
                     <LogIn className="w-4 h-4" />
@@ -209,9 +220,11 @@ const Navbar = () => {
                         to={item.path}
                         onClick={() => setIsMobileMenuOpen(false)}
 
+
                         className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
                           isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
                         }`}
+
 
                       >
                         <IconComponent className="w-4 h-4" />
