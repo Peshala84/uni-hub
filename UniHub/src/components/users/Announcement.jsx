@@ -39,7 +39,7 @@ const Announcement = () => {
       return announcements.slice(0, 3);
     }
     
-    // Show all announcements for logged-in users
+  
     // Sort by created_at date (newest first)
     return announcements.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   };
