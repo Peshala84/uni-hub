@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [userRole, setUserRole] = useState(null); // 'student' or 'lecturer'
 
-  const login = (credentials, role = 'lecturer') => {
+  const login = (credentials,role) => {
     // Mock login - in real app, this would validate with backend
     setIsLoggedIn(true);
     setUserRole(role);
