@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Menu, X, Bell, User, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 
 const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  
+  const navigate = useNavigate(); // Add this hook
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -17,6 +21,29 @@ const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Add this handler function
+  const handleSignOutClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Sign out clicked'); // Debug log
+    setShowSignOutConfirm(true);
+    setShowUserMenu(false); // Close user menu
+  };
+
+  const handleConfirmSignOut = () => {
+    console.log('Confirming sign out'); // Debug log
+    // Add any logout logic here (clear tokens, localStorage, etc.)
+    // localStorage.removeItem('authToken'); // Example
+    // sessionStorage.clear(); // Example
+    setShowSignOutConfirm(false);
+    navigate('/');
+  };
+
+  const handleCancelSignOut = () => {
+    console.log('Canceling sign out'); // Debug log
+    setShowSignOutConfirm(false);
+  };
 
   return (
     <header className={`sticky top-0 z-50 transition-all duration-500 ${
@@ -135,16 +162,23 @@ const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
 
               {/* User Dropdown */}
               {showUserMenu && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-[#132D46]/95 backdrop-blur-xl border border-[#01C38D]/20 rounded-2xl shadow-2xl shadow-[#01C38D]/10 animate-in slide-in-from-top-5 duration-200">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-[#132D46]/95 backdrop-blur-xl border border-[#01C38D]/20 rounded-2xl shadow-2xl shadow-[#01C38D]/10 animate-in slide-in-from-top-5 duration-200 z-50">
                   <div className="p-1">
                     <div className="px-4 py-3 border-b border-[#01C38D]/10">
                       <p className="text-sm font-semibold text-white">Admin User</p>
                       <p className="text-xs text-[#696E79]">admin@company.com</p>
                     </div>
-                    <button className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[#01C38D]/10 rounded-xl transition-colors">
+                    <button 
+                      type="button"
+                      className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[#01C38D]/10 rounded-xl transition-colors"
+                    >
                       Profile Settings
                     </button>
-                    <button className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[#01C38D]/10 rounded-xl transition-colors">
+                    <button 
+                      type="button"
+                      onClick={handleSignOutClick}
+                      className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[#01C38D]/10 rounded-xl transition-colors hover:text-red-300"
+                    >
                       Sign Out
                     </button>
                   </div>
@@ -182,9 +216,47 @@ const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
       {/* Click outside handler for user menu */}
       {showUserMenu && (
         <div 
-          className="fixed inset-0 z-40" 
+          className="fixed inset-0 z-30" 
           onClick={() => setShowUserMenu(false)}
         ></div>
+      )}
+
+      {/* Sign Out Confirmation Modal */}
+      {showSignOutConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-[#132D46] border border-[#01C38D]/20 rounded-2xl p-6 m-4 max-w-md w-full shadow-2xl shadow-[#01C38D]/10">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#01C38D]/20 to-[#01C38D]/10 rounded-full flex items-center justify-center">
+                <User className="text-[#01C38D]" size={32} />
+              </div>
+              
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Sign Out Confirmation
+              </h3>
+              
+              <p className="text-[#696E79] mb-6">
+                Are you sure you want to sign out? You'll need to log in again to access your dashboard.
+              </p>
+              
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={handleCancelSignOut}
+                  className="flex-1 px-4 py-3 bg-[#696E79]/20 hover:bg-[#696E79]/30 text-white rounded-xl transition-all duration-300 border border-[#696E79]/30 hover:border-[#696E79]/50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmSignOut}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 shadow-lg shadow-red-500/20 hover:shadow-red-500/30"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </header>
   );
