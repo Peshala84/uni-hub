@@ -261,5 +261,6 @@ const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
     </header>
   );
 };
+//
 
 export default Header;
