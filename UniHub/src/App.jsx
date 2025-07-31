@@ -6,7 +6,6 @@ import Lecturer from './pages/lecturer/Lecturer';
 import Admin from './pages/admin/Admin'
 
 import ProtectedRoute from './components/users/ProtectedRoute';
-import Navbar from './components/users/Navbar';
 
 
 import Home from './pages/lecturer/Home';
@@ -35,7 +34,7 @@ function App() {
               }
             />
 
-            
+
             <Route
               path="/lecturer/:userId/*"
               element={
