@@ -1,43 +1,71 @@
+// src/components/Navbar.jsx
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Home, LogIn, BookMarked, Bell, User, Menu, X, Calendar, MessageSquare, Users, GraduationCap } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContexts';
+import {
+  BookOpen,
+  Home,
+  LogIn,
+  BookMarked,
+  Bell,
+  User,
+  Menu,
+  X,
+  Calendar,
+  MessageSquare,
+  Users,
+  GraduationCap,
+} from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContexts'; // adjust path as needed
 
 const Navbar = () => {
-  const { isLoggedIn, userRole, logout } = useAuth();
+  const { isLoggedIn, userRole, userId, logout } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isActivePath = (path) => location.pathname === path;
+  const normalizedUserRole = userRole?.toLowerCase();
+
+  const isActivePath = (path) => location.pathname.startsWith(path);
 
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
   };
 
-  // Navigation items based on user role
   const getNavigationItems = () => {
-    if (!isLoggedIn) return [];
+    if (!isLoggedIn || !normalizedUserRole) return [];
 
-    if (userRole === 'lecturer') {
+    if (normalizedUserRole === 'admin') {
       return [
-        { path: '/lecturer/home', icon: Home, label: 'Dashboard' },
-        { path: '/lecturer/courses', icon: BookMarked, label: 'Courses' },
-        { path: '/lecturer/appointments', icon: Calendar, label: 'Appointments' },
-        { path: '/lecturer/notifications', icon: Bell, label: 'Notifications' },
-        { path: '/lecturer/profile', icon: User, label: 'Profile' }
+        { path: `/admin/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
+        { path: `/admin/${userId}/users`, icon: Users, label: 'Manage Users' },
+        { path: `/admin/${userId}/notifications`, icon: Bell, label: 'Notifications' },
+        { path: `/admin/${userId}/profile`, icon: User, label: 'Profile' },
       ];
     }
 
-    if (userRole === 'student') {
+    if (normalizedUserRole === 'lecturer') {
       return [
-        { path: '/student/dashboard', icon: Home, label: 'Dashboard' },
-        { path: '/student/courses', icon: BookMarked, label: 'My Courses' },
-        { path: '/student/appointments', icon: Calendar, label: 'Appointments' },
-        { path: '/student/peer-learning', icon: Users, label: 'Peer Learning' },
-        { path: '/student/calendar', icon: Calendar, label: 'Calendar' },
-        { path: '/student/announcements', icon: Bell, label: 'Announcements' },
-        { path: '/student/profile', icon: User, label: 'Profile' }
+
+        { path: `/lecturer/${userId}/home`, icon: Home, label: 'Dashboard' },
+        { path: `/lecturer/${userId}/courses`, icon: BookMarked, label: 'Courses' },
+        { path: `/lecturer/${userId}appointments`, icon: Calendar, label: 'Appointments' },
+        { path: `/lecturer/${userId}/notifications`, icon: Bell, label: 'Notifications' },
+        { path: `/lecturer/${userId}/profile`, icon: User, label: 'Profile' },
+
+      ];
+    }
+
+    if (normalizedUserRole === 'student') {
+      return [
+
+        { path: `/student/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
+        { path: `/student/${userId}/courses`, icon: BookMarked, label: 'My Courses' },
+        { path: `/student/${userId}/appointments`, icon: Calendar, label: 'Appointments' },
+        { path: `/student/${userId}peer-learning`, icon: Users, label: 'Peer Learning' },
+        { path: `/student/${userId}/queries`, icon: MessageSquare, label: 'Queries' },
+        { path: `/student/${userId}/announcements`, icon: Bell, label: 'Announcements' },
+        { path: `/student/${userId}/profile`, icon: User, label: 'Profile' },
+
       ];
     }
 
@@ -47,22 +75,30 @@ const Navbar = () => {
   const navigationItems = getNavigationItems();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-500 border-gray-500shadow-lg">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-500 shadow-lg">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="p-2 transition-colors bg-blue-600 rounded-lg group-hover:bg-blue-700">
-              {userRole === 'lecturer' ? (
+              {normalizedUserRole === 'lecturer' ? (
                 <GraduationCap className="w-6 h-6 text-white" />
-              ) : userRole === 'student' ? (
+              ) : normalizedUserRole === 'student' ? (
                 <BookOpen className="w-6 h-6 text-white" />
+              ) : normalizedUserRole === 'admin' ? (
+                <Users className="w-6 h-6 text-white" />
               ) : (
                 <BookOpen className="w-6 h-6 text-white" />
               )}
             </div>
             <span className="text-xl font-bold text-gray-800 transition-colors group-hover:text-blue-600">
-              {userRole === 'lecturer' ? 'UniHub - Lecturer' : userRole === 'student' ? 'UniHub - Student' : 'UniHub'}
+              {normalizedUserRole === 'lecturer'
+                ? 'UniHub - Lecturer'
+                : normalizedUserRole === 'student'
+                ? 'UniHub - Student'
+                : normalizedUserRole === 'admin'
+                ? 'UniHub - Admin'
+                : 'UniHub'}
             </span>
           </Link>
 
@@ -72,20 +108,22 @@ const Navbar = () => {
               <>
                 <Link
                   to="/"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath('/')
-                    ? 'bg-blue-100 text-blue-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-                    }`}
+
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                  }`}
+
                 >
                   <Home className="w-4 h-4" />
                   <span>Home</span>
                 </Link>
                 <Link
-                  to="/lecturer/login"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath('/lecturer/login')
-                    ? 'bg-blue-100 text-blue-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-                    }`}
+
+                  to="/login"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                  }`}
+
                 >
                   <LogIn className="w-4 h-4" />
                   <span>Login</span>
@@ -99,10 +137,11 @@ const Navbar = () => {
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath(item.path)
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-                        }`}
+
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                        isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                      }`}
+
                     >
                       <IconComponent className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -123,6 +162,7 @@ const Navbar = () => {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 text-gray-700 transition-colors rounded-lg md:hidden hover:bg-gray-100"
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -137,21 +177,23 @@ const Navbar = () => {
                   <Link
                     to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath('/')
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+
                   >
                     <Home className="w-4 h-4" />
                     <span>Home</span>
                   </Link>
                   <Link
-                    to="/lecturer/login"
+                    to="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath('/lecturer/login')
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+
                   >
                     <LogIn className="w-4 h-4" />
                     <span>Login</span>
@@ -166,10 +208,11 @@ const Navbar = () => {
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath(item.path)
-                          ? 'bg-blue-100 text-blue-700 font-medium'
-                          : 'text-gray-700 hover:bg-gray-100'
-                          }`}
+
+                        className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                          isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+
                       >
                         <IconComponent className="w-4 h-4" />
                         <span>{item.label}</span>
