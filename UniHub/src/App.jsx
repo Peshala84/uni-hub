@@ -8,7 +8,6 @@ import ProtectedRoute from './components/users/ProtectedRoute';
 import Navbar from './components/users/Navbar';
 
 import ProtectedRoute from './components/users/ProtectedRoute';
-import Navbar from './components/users/Navbar';
 
 
 import Home from './pages/lecturer/Home';
@@ -17,7 +16,7 @@ import LecturerCourses from './pages/lecturer/Courses';
 import Notifications from './pages/lecturer/Notification';
 import ProfilePage from './pages/lecturer/Profile';
 import Student from './pages/student/Student';
-import Navbar from './components/users/Navbar';
+
 
 
 function App() {
@@ -29,9 +28,17 @@ function App() {
           <Routes>
 
 
-            <Route path="/student/*" element={<Student />} />
+           <Route
+              path="/student/:userId/*"
+              element={
+                <ProtectedRoute>
+                  <Student /> {/* Your student component/routes */}
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/" element={<Navigate to="/lecturer" replace />} />
+
+
             <Route
               path="/lecturer/:userId/*"
               element={
