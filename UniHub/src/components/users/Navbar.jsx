@@ -34,8 +34,6 @@ const Navbar = () => {
         { path: '/student/courses', icon: BookMarked, label: 'My Courses' },
         { path: '/student/appointments', icon: Calendar, label: 'Appointments' },
         { path: '/student/peer-learning', icon: Users, label: 'Peer Learning' },
-        { path: '/student/calendar', icon: Calendar, label: 'Calendar' },
-        { path: '/student/announcements', icon: Bell, label: 'Announcements' },
         { path: '/student/profile', icon: User, label: 'Profile' }
       ];
     }
