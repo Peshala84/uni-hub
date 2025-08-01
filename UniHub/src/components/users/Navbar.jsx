@@ -16,6 +16,7 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContexts'; // adjust path as needed
+import unihubLogo from '../../assets/unihub_logo.jpeg';
 
 const Navbar = () => {
   const { isLoggedIn, userRole, userId, logout } = useAuth();
@@ -49,7 +50,7 @@ const Navbar = () => {
 
         { path: `/lecturer/${userId}/home`, icon: Home, label: 'Dashboard' },
         { path: `/lecturer/${userId}/courses`, icon: BookMarked, label: 'Courses' },
-        { path: `/lecturer/${userId}appointments`, icon: Calendar, label: 'Appointments' },
+        { path: `/lecturer/${userId}/appointments`, icon: Calendar, label: 'Appointments' },
         { path: `/lecturer/${userId}/notifications`, icon: Bell, label: 'Notifications' },
         { path: `/lecturer/${userId}/profile`, icon: User, label: 'Profile' },
 
@@ -83,25 +84,21 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="p-2 transition-colors bg-blue-600 rounded-lg group-hover:bg-blue-700">
-              {normalizedUserRole === 'lecturer' ? (
-                <GraduationCap className="w-6 h-6 text-white" />
-              ) : normalizedUserRole === 'student' ? (
-                <BookOpen className="w-6 h-6 text-white" />
-              ) : normalizedUserRole === 'admin' ? (
-                <Users className="w-6 h-6 text-white" />
-              ) : (
-                <BookOpen className="w-6 h-6 text-white" />
-              )}
+            <div className="p-1 transition-colors bg-white border border-gray-200 rounded-lg group-hover:bg-gray-50">
+              <img
+                src={unihubLogo}
+                alt="UniHub Logo"
+                className="object-contain h-9 w-9"
+              />
             </div>
             <span className="text-xl font-bold text-gray-800 transition-colors group-hover:text-blue-600">
               {normalizedUserRole === 'lecturer'
                 ? 'UniHub - Lecturer'
                 : normalizedUserRole === 'student'
-                ? 'UniHub - Student'
-                : normalizedUserRole === 'admin'
-                ? 'UniHub - Admin'
-                : 'UniHub'}
+                  ? 'UniHub - Student'
+                  : normalizedUserRole === 'admin'
+                    ? 'UniHub - Admin'
+                    : 'UniHub'}
             </span>
           </Link>
 
@@ -113,9 +110,8 @@ const Navbar = () => {
                   to="/"
 
 
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                    isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    }`}
 
 
                 >
@@ -125,9 +121,8 @@ const Navbar = () => {
                 <Link
 
                   to="/login"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                    isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    }`}
 
                 >
                   <LogIn className="w-4 h-4" />
@@ -144,9 +139,8 @@ const Navbar = () => {
                       to={item.path}
 
 
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                        isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-                      }`}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                        }`}
 
 
                     >
@@ -186,9 +180,8 @@ const Navbar = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
 
 
-                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath('/') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
 
 
                   >
@@ -200,9 +193,8 @@ const Navbar = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
 
 
-                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath('/login') ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
 
 
                   >
@@ -221,9 +213,8 @@ const Navbar = () => {
                         onClick={() => setIsMobileMenuOpen(false)}
 
 
-                        className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
-                          isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
-                        }`}
+                        className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${isActivePath(item.path) ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                          }`}
 
 
                       >
