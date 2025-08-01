@@ -7,9 +7,6 @@ import Admin from './pages/admin/Admin'
 import ProtectedRoute from './components/users/ProtectedRoute';
 import Navbar from './components/users/Navbar';
 
-import ProtectedRoute from './components/users/ProtectedRoute';
-
-
 import Home from './pages/lecturer/Home';
 import Login from './components/users/Login';
 import LecturerCourses from './pages/lecturer/Courses';
