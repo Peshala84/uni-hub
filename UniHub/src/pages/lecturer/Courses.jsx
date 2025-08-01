@@ -71,17 +71,17 @@ const Courses = () => {
     try {
       // Use userData.id with fallback to 1 for development/testing
       const lecturerId = userData?.id || 1;
-      
+
       console.log('Fetching feedback for lecturer ID:', lecturerId);
-      
+
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/feedback`);
-      
+
       console.log('Feedback response:', response.data);
       setFeedbacks(response.data);
-      
+
     } catch (error) {
       console.error('Error fetching feedback:', error);
-      
+
       if (error.response) {
         setFeedbackError(error.response.data?.message || 'Failed to fetch feedback');
       } else if (error.request) {
@@ -102,17 +102,17 @@ const Courses = () => {
     try {
       // Use userData.id with fallback to 1 for development/testing
       const lecturerId = userData?.id || 1;
-      
+
       console.log('Fetching announcements for lecturer ID:', lecturerId);
-      
+
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/announcements`);
-      
+
       console.log('Announcements response:', response.data);
       setAnnouncements(response.data);
-      
+
     } catch (error) {
       console.error('Error fetching announcements:', error);
-      
+
       if (error.response) {
         setAnnouncementError(error.response.data?.message || 'Failed to fetch announcements');
       } else if (error.request) {
@@ -133,17 +133,17 @@ const Courses = () => {
     try {
       // Use userData.id with fallback to 1 for development/testing
       const lecturerId = userData?.id || 1;
-      
+
       console.log('Fetching assignments for lecturer ID:', lecturerId);
-      
+
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/assignments`);
-      
+
       console.log('Assignments response:', response.data);
       setAssignments(response.data);
-      
+
     } catch (error) {
       console.error('Error fetching assignments:', error);
-      
+
       if (error.response) {
         setAssignmentError(error.response.data?.message || 'Failed to fetch assignments');
       } else if (error.request) {
@@ -164,17 +164,17 @@ const Courses = () => {
     try {
       // Use userData.id with fallback to 1 for development/testing
       const lecturerId = userData?.id || 1;
-      
+
       console.log('Fetching resources for lecturer ID:', lecturerId);
-      
+
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/resources`);
-      
+
       console.log('Resources response:', response.data);
       setResources(response.data);
-      
+
     } catch (error) {
       console.error('Error fetching resources:', error);
-      
+
       if (error.response) {
         setResourceError(error.response.data?.message || 'Failed to fetch resources');
       } else if (error.request) {
@@ -244,7 +244,7 @@ const Courses = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     const formType = e.target.getAttribute('data-form-type'); // To distinguish between announcement, assignment, and resource forms
-    
+
 
     if (file) {
       // Check file type (images and PDFs only)
@@ -292,7 +292,7 @@ const Courses = () => {
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", announcementForm.course_id);
       formData.append("content", announcementForm.content);
-      
+
       if (announcementForm.link) {
         formData.append('link', announcementForm.link);
       }
@@ -563,12 +563,12 @@ const Courses = () => {
       const formData = new FormData();
       // Use userData.id with fallback to 1 for development/testing
       const lecturerId = userData?.id || 1;
-      
+
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", assignmentForm.course_id);
       formData.append("title", assignmentForm.title);
       formData.append("description", assignmentForm.description);
-      
+
       // Convert date to Java-compatible format (YYYY-MM-DD)
       const dueDate = new Date(assignmentForm.due_date);
       const formattedDate = dueDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
@@ -661,7 +661,7 @@ const Courses = () => {
       const formData = new FormData();
       // Use userData.id with fallback to 1 for development/testing
       const lecturerId = userData?.id || 1;
-      
+
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", resourceForm.course_id);
       formData.append("fileName", resourceForm.file_name);
@@ -935,8 +935,8 @@ const Courses = () => {
 
             <div className="space-y-4">
               {announcements.map((announcement) => (
-                <div 
-                  key={announcement.announcement_id} 
+                <div
+                  key={announcement.announcement_id}
                   className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -954,7 +954,7 @@ const Courses = () => {
                           {announcement.content}
                         </p>
                       </div>
-                      
+
                       {/* Link */}
                       {announcement.link && (
                         <div className="mb-3">
@@ -971,7 +971,7 @@ const Courses = () => {
                           </a>
                         </div>
                       )}
-                      
+
                       {/* Attachment */}
                       {announcement.attachment && (
                         <div className="mb-3">
@@ -995,7 +995,7 @@ const Courses = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Actions */}
                     <div className="flex items-center ml-4 space-x-2">
                       <button
@@ -1010,11 +1010,11 @@ const Courses = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Timestamp */}
                   <div className="flex items-center justify-between pt-3 text-xs text-gray-500 border-t border-gray-100">
                     <span>
-                      {announcement.created_at 
+                      {announcement.created_at
                         ? `Posted on ${new Date(announcement.created_at).toLocaleDateString()} at ${new Date(announcement.created_at).toLocaleTimeString()}`
                         : 'Recently posted'
                       }
@@ -1253,8 +1253,8 @@ const Courses = () => {
             {/* Assignments List */}
             <div className="space-y-4">
               {assignments.map((assignment) => (
-                <div 
-                  key={assignment.assignment_id} 
+                <div
+                  key={assignment.assignment_id}
                   className="p-6 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -1266,25 +1266,24 @@ const Courses = () => {
                         <span className="px-3 py-1 text-sm font-medium text-purple-700 bg-purple-100 rounded-full">
                           ID: {assignment.assignment_id}
                         </span>
-                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                          new Date(assignment.date) < new Date() 
-                            ? 'text-red-700 bg-red-100' 
+                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${new Date(assignment.date) < new Date()
+                            ? 'text-red-700 bg-red-100'
                             : 'text-green-700 bg-green-100'
-                        }`}>
+                          }`}>
                           Due: {new Date(assignment.date).toLocaleDateString()}
                         </span>
                       </div>
-                      
+
                       <h4 className="mb-3 text-xl font-semibold text-gray-800">
                         {assignment.title}
                       </h4>
-                      
+
                       <div className="mb-4">
                         <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
                           {assignment.description}
                         </p>
                       </div>
-                      
+
                       {/* Attachment */}
                       {assignment.attachment && (
                         <div className="mb-4">
@@ -1328,7 +1327,7 @@ const Courses = () => {
                         </div>
                       </div> */}
                     </div>
-                    
+
                     {/* Actions */}
                     <div className="flex items-center ml-6 space-x-2">
                       <button
@@ -1355,7 +1354,7 @@ const Courses = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Timestamp */}
                   {/* <div className="flex items-center justify-between pt-4 text-xs text-gray-500 border-t border-gray-100">
                     <span>
@@ -1553,8 +1552,8 @@ const Courses = () => {
             {/* Resources List */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {resources.map((resource) => (
-                <div 
-                  key={resource.resource_id} 
+                <div
+                  key={resource.resource_id}
                   className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -1567,11 +1566,11 @@ const Courses = () => {
                           ID: {resource.resource_id}
                         </span>
                       </div>
-                      
+
                       <h4 className="mb-3 text-lg font-semibold text-gray-800">
                         {resource.file_name}
                       </h4>
-                      
+
                       {/* Attachment */}
                       {resource.attachment && (
                         <div className="mb-3">
@@ -1597,7 +1596,7 @@ const Courses = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Actions */}
                     <div className="flex items-center ml-4 space-x-2">
                       <button
@@ -1624,11 +1623,11 @@ const Courses = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Timestamp */}
                   <div className="flex items-center justify-between pt-3 text-xs text-gray-500 border-t border-gray-100">
                     <span>
-                      {resource.created_at 
+                      {resource.created_at
                         ? `Uploaded on ${new Date(resource.created_at).toLocaleDateString()} at ${new Date(resource.created_at).toLocaleTimeString()}`
                         : 'Recently uploaded'
                       }
@@ -1727,13 +1726,13 @@ const Courses = () => {
 
                       </span>
                     </div>
-                    
+
                     <div className="mb-3">
                       <p className="text-sm leading-relaxed text-gray-600">
                         "{feedback.review || 'No review provided'}"
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center justify-between text-xs text-gray-500">
                       <span>Student: {feedback.student_name || `Student ${feedback.student_id}`}</span>
                       {feedback.created_at && (
@@ -1758,7 +1757,7 @@ const Courses = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-yellow-600">
-                      {feedbacks.length > 0 
+                      {feedbacks.length > 0
                         ? (feedbacks.reduce((sum, f) => sum + (f.rate || 0), 0) / feedbacks.length).toFixed(1)
                         : '0.0'
                       }
@@ -1784,22 +1783,25 @@ const Courses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {!userData && (
+      {/* {!userData && (
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="p-4 mb-4 text-yellow-800 bg-yellow-100 border border-yellow-200 rounded-lg">
             <p>⚠️ User not logged in. Using default lecturer ID for development.</p>
           </div>
         </div>
-      )}
+      )} */}
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <div className="flex items-center mb-4 space-x-3">
-            <BookOpen className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-800">Course Management</h1>
+        <div className="p-6 mb-6 bg-white border border-gray-200 shadow-lg rounded-2xl">
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/80 p-3 rounded-xl">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-[#132D46]">Course Management</h1>
+              <p className="text-[#696E79] font-medium"> Manage your courses, assignments, and interact with students efficiently.
+              </p>
+            </div>
           </div>
-          <p className="text-gray-600">
-            Manage your courses, assignments, and interact with students efficiently.
-          </p>
         </div>
 
         {/* Tab Navigation */}

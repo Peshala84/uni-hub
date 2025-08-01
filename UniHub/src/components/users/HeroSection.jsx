@@ -1,10 +1,19 @@
 import React from 'react';
 import { GraduationCap, Users, BookOpen } from 'lucide-react';
+import NSBMPhoto from '../../assets/nsbm_photo.jpeg'; // Adjust the path as necessary
 
 const HeroSection = () => {
   return (
-    <div className="text-white bg-gradient-to-r from-custom-blue to-custom-green">
-      <div className="px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="relative overflow-hidden text-white bg-gradient-to-r from-custom-blue to-custom-green">
+      {/* Blurred background image */}
+      <img
+        src={NSBMPhoto}
+        alt="NSBM Campus"
+        className="absolute inset-0 z-0 object-cover w-full h-full pointer-events-none select-none blur-md opacity-60"
+        style={{ filter: 'blur(2px)', objectPosition: 'center' }}
+      />
+      {/* Gradient overlay content */}
+      <div className="relative z-10 px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <div className="p-4 rounded-full bg-white/10 backdrop-blur-sm">
