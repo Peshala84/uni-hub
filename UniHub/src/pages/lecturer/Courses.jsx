@@ -827,7 +827,7 @@ const Courses = () => {
                     />
                   </div>
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Link (Optional)</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Link <span className="text-red-500">*</span> </label>
                     <input
                       type="url"
                       value={announcementForm.link}
@@ -839,7 +839,7 @@ const Courses = () => {
                   </div>
                   <div>
 
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Attachment (Optional)</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Attachment <span className="text-red-500">*</span></label>
                     <div className="space-y-2">
                       <input
                         type="file"
@@ -1159,7 +1159,7 @@ const Courses = () => {
                     />
                   </div>
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Attachment (Optional)</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Attachment <span className="text-red-500">*</span></label>
                     <div className="space-y-2">
                       <input
                         type="file"
@@ -1457,7 +1457,7 @@ const Courses = () => {
                   </div>
                   <div>
 
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Attachment (Optional)</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Attachment</label>
                     <div className="space-y-2">
                       <input
                         type="file"
