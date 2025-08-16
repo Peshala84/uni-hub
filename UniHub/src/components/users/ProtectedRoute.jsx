@@ -1,19 +1,14 @@
-// ProtectedRoute.jsx
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContexts'; // adjust path
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContexts";
 
 const ProtectedRoute = ({ children }) => {
-  const { isLoggedIn } = useAuth();
-  const location = useLocation();
+  const { isLoggedIn, loading } = useAuth();
 
-  if (!isLoggedIn) {
-    // Redirect to login page, remember requested page in state to return after login
-    return <Navigate to="/login" replace state={{ from: location }} />;
+  if (loading) {
+    return <div>Loading...</div>; // or a spinner
   }
 
-  // If logged in, allow access
-  return children;
+  return isLoggedIn ? children : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;
