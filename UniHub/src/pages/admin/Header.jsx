@@ -71,12 +71,6 @@ const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
                   )}
                 </div>
               </button>
-              
-              <div className="hidden sm:block">
-                <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-white via-[#01C38D] to-white bg-clip-text text-transparent animate-pulse">
-                  Admin Dashboard
-                </h1>
-              </div>
             </div>
             
             {/* Time Display - Hidden on mobile */}

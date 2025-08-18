@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Edit3, Save, X, CreditCard, BookOpen, GraduationCap, MapPin, Calendar, Award, Star } from 'lucide-react';
+import { User, Mail, Phone, Edit3, Save, X, CreditCard, BookOpen, GraduationCap, MapPin, Calendar, Award, Star, HourglassIcon, HouseWifi, HomeIcon, Youtube } from 'lucide-react';
 
 const mockProfile = {
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@university.edu',
+    name: 'Nimantha Madushan',
+    email: 'nimantham.lk@gmail.com',
     studentId: 'CS2021456',
     major: 'Computer Science',
     year: '3',
-    phone: '+1 (555) 123-4567',
+    phone: '077 1415855',
     bio: 'Passionate computer science student with a keen interest in artificial intelligence and machine learning. I enjoy solving complex problems and contributing to open-source projects. Currently working on my final year project involving natural language processing.',
     gpa: '3.85',
     completedCredits: '98',
     expectedGraduation: 'May 2025',
-    location: 'San Francisco, CA'
+    location: 'Rajagiriya, Sri Lanka'
 };
 
 const achievements = [
