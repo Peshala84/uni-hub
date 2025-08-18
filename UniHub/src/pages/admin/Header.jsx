@@ -32,10 +32,7 @@ const Header = ({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }) => {
   };
 
   const handleConfirmSignOut = () => {
-    console.log('Confirming sign out'); // Debug log
-    // Add any logout logic here (clear tokens, localStorage, etc.)
-    // localStorage.removeItem('authToken'); // Example
-    // sessionStorage.clear(); // Example
+    console.log('Confirming sign out'); 
     setShowSignOutConfirm(false);
     navigate('/');
   };

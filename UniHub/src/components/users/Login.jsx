@@ -16,44 +16,69 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMessage('');
-    try {
-      const res = await axios.post('http://localhost:8086/api/v1/user/login', { email, password });
-      const { token } = res.data;
+  e.preventDefault();
+  setIsLoading(true);
+  setErrorMessage('');
 
-      if (!token) {
-        throw new Error('Token not provided');
-      }
+  // Debug: Log what we're sending
+  console.log('Login Request Data:', { email, password });
+  console.log('Request URL:', 'http://localhost:8086/api/v1/user/login');
 
-      // Update auth context
-      login(token);
+  try {
+    const res = await axios.post('http://localhost:8086/api/v1/user/login', { email, password });
+    
+    // Debug: Log the complete response
+    console.log('Login Response Status:', res.status);
+    console.log('Login Response Headers:', res.headers);
+    console.log('Login Response Data:', res.data);
 
-      // Decode token to get role and userId (optional, but safe to do)
-      const decoded = JSON.parse(atob(token.split('.')[1])); // simple base64 decode without external library
-      const userRole = decoded.role.toLowerCase().trim();
-      const userId = decoded.userId;
-      const lecturerId = decoded.lecturerId || null; // handle lecturerId if exists
-      const studentId = decoded.studentId || null; // handle studentId if exists
+    const { token } = res.data;
 
-      // Navigate based on user role
-      if (userRole === 'admin') {
-        navigate(`/admin/${userId}`);
-      } else if (userRole === 'lecturer') {
-        navigate(`/lecturer/${lecturerId}/home`);
-      } else if (userRole === 'student') {
-        navigate(`/student/${studentId}/dashboard`);
-      } else {
-        navigate('/unauthorized');
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      setErrorMessage('Invalid email or password.');
-    } finally {
-      setIsLoading(false);
+    if (!token) {
+      console.error('No token in response:', res.data);
+      throw new Error('Token not provided');
     }
-  };
+
+    // Debug: Log token details
+    console.log('Received Token:', token);
+
+    // Update auth context
+    login(token);
+
+    // Decode token to get role and userId
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    console.log('Decoded Token:', decoded);
+    
+    const userRole = decoded.role.toLowerCase().trim();
+    const userId = decoded.userId;
+    const lecturerId = decoded.lecturerId || null;
+    const studentId = decoded.studentId || null;
+
+    console.log('Navigation Info:', { userRole, userId, lecturerId, studentId });
+
+    // Navigate based on user role
+    if (userRole === 'admin') {
+      navigate(`/admin/${userId}`);
+    } else if (userRole === 'lecturer') {
+      navigate(`/lecturer/${lecturerId}/home`);
+    } else if (userRole === 'student') {
+      navigate(`/student/${studentId}/dashboard`);
+    } else {
+      navigate('/unauthorized');
+    }
+  } catch (error) {
+    // Enhanced error debugging
+    console.error('Login failed - Full Error:', error);
+    console.error('Error Response:', error.response?.data);
+    console.error('Error Status:', error.response?.status);
+    console.error('Error Headers:', error.response?.headers);
+    console.error('Error Config:', error.config);
+    
+    setErrorMessage('Invalid email or password.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
