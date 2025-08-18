@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, RefreshCw, MessageSquare, MapPin } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContexts';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const Appointment = () => {
   const { userData } = useAuth();
+  const { lecturerId } = useParams();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,22 +18,25 @@ const Appointment = () => {
     try {
       setLoading(true);
       setError('');
-      
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-      
+
+      // Use lecturerId from auth context
+      if (!lecturerId) {
+        setError('Lecturer ID not found. Please ensure you are logged in.');
+        return;
+      }
+
       console.log('Fetching pending appointments for lecturer ID:', lecturerId);
-      
+
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/appointments/pending`);
 
       console.log('Response status:', response.status);
       console.log('Pending appointments data:', response.data);
-      
+
       setAppointments(Array.isArray(response.data) ? response.data : []);
-      
+
     } catch (err) {
       console.error('Error fetching pending appointments:', err);
-      
+
       if (err.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
@@ -56,7 +61,7 @@ const Appointment = () => {
   const handleAcceptAppointment = async (appointment) => {
     // Get the appointment ID from various possible field names
     const appointmentId = appointment.id || appointment.appointmentId || appointment.appointment_id;
-    
+
     if (!appointmentId) {
       console.error('No appointment ID found in appointment object:', appointment);
       setError('Unable to process appointment - missing ID');
@@ -67,34 +72,37 @@ const Appointment = () => {
       setActionLoading(prev => ({ ...prev, [appointmentId]: 'accepting' }));
       setError('');
       setSuccessMessage('');
-      
-      const lecturerId = userData?.id || 1;
-      
+
+      if (!lecturerId) {
+        setError('Lecturer ID not found. Please ensure you are logged in.');
+        return;
+      }
+
       console.log('Accepting appointment:', appointmentId, 'for lecturer:', lecturerId);
       console.log('Full appointment object:', appointment);
-      
+
       const response = await axios.put(`http://localhost:8086/api/v1/lecturer/${lecturerId}/appointment/${appointmentId}/take`);
 
       console.log('Accept response status:', response.status);
       console.log('Updated appointment:', response.data);
-      
+
       // Remove the accepted appointment from pending list
       setAppointments(prev => prev.filter(apt => (apt.id || apt.appointmentId || apt.appointment_id) !== appointmentId));
       setSuccessMessage('Appointment accepted successfully!');
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(''), 3000);
-      
+
     } catch (err) {
       console.error('Error accepting appointment:', err);
-      
+
       if (err.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.error('Backend error response:', err.response.data);
         console.error('Response status:', err.response.status);
         console.error('Response headers:', err.response.headers);
-        
+
         // Try to parse error message
         let errorMessage = 'Failed to accept appointment';
         if (err.response.data) {
@@ -123,7 +131,7 @@ const Appointment = () => {
   const handleRejectAppointment = async (appointment) => {
     // Get the appointment ID from various possible field names
     const appointmentId = appointment.id || appointment.appointmentId || appointment.appointment_id;
-    
+
     if (!appointmentId) {
       console.error('No appointment ID found in appointment object:', appointment);
       setError('Unable to process appointment - missing ID');
@@ -138,35 +146,38 @@ const Appointment = () => {
       setActionLoading(prev => ({ ...prev, [appointmentId]: 'rejecting' }));
       setError('');
       setSuccessMessage('');
-      
-      const lecturerId = userData?.id || 1;
-      
+
+      if (!lecturerId) {
+        setError('Lecturer ID not found. Please ensure you are logged in.');
+        return;
+      }
+
       console.log('Rejecting appointment:', appointmentId, 'for lecturer:', lecturerId);
       console.log('Full appointment object:', appointment);
-      
+
       // Make API call to reject appointment
       const response = await axios.put(`http://localhost:8086/api/v1/lecturer/${lecturerId}/appointment/${appointmentId}/reject`);
 
       console.log('Reject response status:', response.status);
       console.log('Updated appointment:', response.data);
-      
+
       // Remove the rejected appointment from pending list
       setAppointments(prev => prev.filter(apt => (apt.id || apt.appointmentId || apt.appointment_id) !== appointmentId));
       setSuccessMessage('Appointment rejected successfully!');
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(''), 3000);
-      
+
     } catch (err) {
       console.error('Error rejecting appointment:', err);
-      
+
       if (err.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.error('Backend error response:', err.response.data);
         console.error('Response status:', err.response.status);
         console.error('Response headers:', err.response.headers);
-        
+
         // Try to parse error message
         let errorMessage = 'Failed to reject appointment';
         if (err.response.data) {
@@ -193,8 +204,10 @@ const Appointment = () => {
 
   // Fetch appointments on component mount
   useEffect(() => {
-    fetchPendingAppointments();
-  }, [userData]);
+    if (lecturerId) {
+      fetchPendingAppointments();
+    }
+  }, [lecturerId]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -338,7 +351,7 @@ const Appointment = () => {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-3">
                           <Clock className="w-5 h-5 text-[#2CC295]" />
                           <div>
@@ -382,7 +395,7 @@ const Appointment = () => {
                           </>
                         )}
                       </button>
-                      
+
                       <button
                         onClick={() => handleAcceptAppointment(appointment)}
                         disabled={actionLoading[appointment.id || appointment.appointmentId || appointment.appointment_id]}

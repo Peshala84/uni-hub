@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Bell, Calendar, MessageSquare, AlertCircle, CheckCircle, Clock, X } from 'lucide-react';
 import axios from 'axios';
 
@@ -7,9 +8,12 @@ const Notification = ({ lecturerId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
-
-  // Use default lecturer ID 1 until login is implemented
-  const currentLecturerId = lecturerId || 1;
+  
+  // Get lecturer ID from URL parameters
+  const { lecturerId: urlLecturerId } = useParams();
+  
+  // Use lecturer ID from params, fallback to prop, then fallback to null
+  const currentLecturerId = urlLecturerId || lecturerId;
 
   // Fetch notifications from API
   useEffect(() => {
@@ -41,9 +45,14 @@ const Notification = ({ lecturerId }) => {
       }
     };
 
-    // Always fetch notifications (will use default ID 1 if not provided)
-    console.log('Starting to fetch notifications for lecturer ID:', currentLecturerId);
-    fetchNotifications();
+    // Only fetch notifications if lecturer ID is available
+    if (currentLecturerId) {
+      console.log('Starting to fetch notifications for lecturer ID:', currentLecturerId);
+      fetchNotifications();
+    } else {
+      setLoading(false);
+      setError('Lecturer ID not found');
+    }
   }, [currentLecturerId]);
 
   // Helper function to format time

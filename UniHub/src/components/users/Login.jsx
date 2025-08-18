@@ -16,27 +16,42 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setErrorMessage('');
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMessage('');
+    try {
+      const res = await axios.post('http://localhost:8086/api/v1/user/login', { email, password });
+      const { token } = res.data;
 
-  // Debug: Log what we're sending
-  console.log('Login Request Data:', { email, password });
-  console.log('Request URL:', 'http://localhost:8086/api/v1/user/login');
+      if (!token) {
+        throw new Error('Token not provided');
+      }
 
-  try {
-    const res = await axios.post('http://localhost:8086/api/v1/user/login', { email, password });
-    
-    // Debug: Log the complete response
-    console.log('Login Response Status:', res.status);
-    console.log('Login Response Headers:', res.headers);
-    console.log('Login Response Data:', res.data);
+      // Update auth context
+      login(token);
 
-    const { token } = res.data;
+      // Decode token to get role and userId (optional, but safe to do)
+      const decoded = JSON.parse(atob(token.split('.')[1])); // simple base64 decode without external library
+      const userRole = decoded.role.toLowerCase().trim();
+      const userId = decoded.userId;
+      const lecturerId = decoded.lecturerId || null; // handle lecturerId if exists
+      const studentId = decoded.studentId || null; // handle studentId if exists
 
-    if (!token) {
-      console.error('No token in response:', res.data);
-      throw new Error('Token not provided');
+      // Navigate based on user role
+      if (userRole === 'admin') {
+        navigate(`/admin/${userId}`);
+      } else if (userRole === 'lecturer') {
+        navigate(`/lecturer/${lecturerId}/home`);
+      } else if (userRole === 'student') {
+        navigate(`/student/${studentId}/home`);
+      } else {
+        navigate('/unauthorized');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      setErrorMessage('Invalid email or password.');
+    } finally {
+      setIsLoading(false);
     }
 
     // Debug: Log token details
@@ -151,7 +166,7 @@ const Login = () => {
                 <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-medium" onClick={(e) => e.preventDefault()}>
+              <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium" >
                 Forgot password?
               </a>
             </div>

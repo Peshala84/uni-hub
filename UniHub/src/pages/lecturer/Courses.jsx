@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { BookOpen, Plus, MessageSquare, Star, FileText, BookMarked, Users, HelpCircle } from 'lucide-react';
 import Queries from '../../components/users/Queries';
 import { useAuth } from '../../contexts/AuthContexts';
 import axios from 'axios';
 
+
 const Courses = () => {
   const [activeTab, setActiveTab] = useState('announcements');
   const [showForm, setShowForm] = useState(false);
   const { userData } = useAuth();
+  const { lecturerId } = useParams();
 
 
   // Feedback state
@@ -41,6 +44,32 @@ const Courses = () => {
     attachment: null // Will store the actual file object
   });
 
+  // Edit announcement states
+  const [editingAnnouncement, setEditingAnnouncement] = useState(null);
+  const [editForm, setEditForm] = useState({
+    content: '',
+    link: '',
+    attachment: null,
+    removeAttachment: false
+  });
+
+  // Edit assignment states
+  const [editingAssignment, setEditingAssignment] = useState(null);
+  const [assignmentEditForm, setAssignmentEditForm] = useState({
+    title: '',
+    description: '',
+    date: '',
+    attachment: null,
+    removeAttachment: false
+  });
+
+  // Edit resource states
+  const [editingResource, setEditingResource] = useState(null);
+  const [resourceEditForm, setResourceEditForm] = useState({
+    file_name: '',
+    attachment: null,
+    removeAttachment: false
+  });
 
   // Form states for assignment
   const [assignmentForm, setAssignmentForm] = useState({
@@ -69,9 +98,6 @@ const Courses = () => {
     setFeedbackError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching feedback for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/feedback`);
@@ -96,13 +122,11 @@ const Courses = () => {
 
   // Function to fetch announcements data
   const fetchAnnouncements = async () => {
+   
     setIsLoadingAnnouncements(true);
     setAnnouncementError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching announcements for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/announcements`);
@@ -112,6 +136,8 @@ const Courses = () => {
 
     } catch (error) {
       console.error('Error fetching announcements:', error);
+      console.log('Fetching announcements for lecturer ID:', lecturerId);
+
 
       if (error.response) {
         setAnnouncementError(error.response.data?.message || 'Failed to fetch announcements');
@@ -131,9 +157,6 @@ const Courses = () => {
     setAssignmentError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching assignments for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/assignments`);
@@ -162,9 +185,6 @@ const Courses = () => {
     setResourceError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching resources for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/resources`);
@@ -196,10 +216,10 @@ const Courses = () => {
 
   // Fetch announcements when component mounts or when activeTab changes to announcements
   useEffect(() => {
-    if (activeTab === 'announcements') {
+    if (activeTab === 'announcements' && lecturerId) {
       fetchAnnouncements();
     }
-  }, [activeTab, userData]);
+  }, [activeTab, userData, lecturerId]);
 
 
   // Fetch assignments when component mounts or when activeTab changes to assignments
@@ -287,8 +307,6 @@ const Courses = () => {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", announcementForm.course_id);
       formData.append("content", announcementForm.content);
@@ -386,9 +404,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Deleting announcement:', announcementId);
 
       const response = await axios.delete(
@@ -434,6 +449,217 @@ const Courses = () => {
     }
   };
 
+  // Edit announcement functions
+  const handleEditAnnouncement = (announcement) => {
+    setEditingAnnouncement(announcement.announcement_id);
+    setEditForm({
+      content: announcement.content || '',
+      link: announcement.link || '',
+      attachment: null,
+      removeAttachment: false
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAnnouncement(null);
+    setEditForm({
+      content: '',
+      link: '',
+      attachment: null,
+      removeAttachment: false
+    });
+  };
+
+  const handleUpdateAnnouncement = async (announcementId) => {
+    if (!editForm.content.trim()) {
+      setSubmitMessage({ type: 'error', text: 'Content is required.' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage({ type: '', text: '' });
+
+    try {
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append("content", editForm.content);
+
+      if (editForm.link) {
+        formData.append("link", editForm.link);
+      }
+
+      if (editForm.attachment) {
+        formData.append("attachment", editForm.attachment);
+      }
+
+      if (editForm.removeAttachment) {
+        formData.append("removeAttachment", "true");
+      }
+
+      console.log('Updating announcement:', announcementId, {
+        content: editForm.content,
+        link: editForm.link,
+        attachment: editForm.attachment ? editForm.attachment.name : null,
+        removeAttachment: editForm.removeAttachment
+      });
+
+      const response = await axios.put(
+        `http://localhost:8086/api/v1/lecturer/${lecturerId}/announcement/${announcementId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log('Update response:', response.data);
+      setSubmitMessage({ type: 'success', text: 'Announcement updated successfully!' });
+
+      // Cancel edit mode
+      handleCancelEdit();
+
+      // Refresh announcements list
+      fetchAnnouncements();
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSubmitMessage({ type: '', text: '' });
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error updating announcement:', error);
+
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setSubmitMessage({
+          type: 'error',
+          text: error.response.data?.message || error.response.data || 'Failed to update announcement'
+        });
+      } else if (error.request) {
+        console.error('Network error:', error.request);
+        setSubmitMessage({
+          type: 'error',
+          text: 'Cannot connect to server. Please ensure the backend is running on port 8086.'
+        });
+      } else {
+        console.error('Request error:', error.message);
+        setSubmitMessage({
+          type: 'error',
+          text: 'An error occurred while updating the announcement.'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Assignment editing functions
+  const handleEditAssignment = (assignment) => {
+    setEditingAssignment(assignment.assignment_id);
+    setAssignmentEditForm({
+      title: assignment.title || '',
+      description: assignment.description || '',
+      date: assignment.date ? new Date(assignment.date).toISOString().split('T')[0] : '',
+      attachment: null,
+      removeAttachment: false
+    });
+  };
+
+  const handleCancelAssignmentEdit = () => {
+    setEditingAssignment(null);
+    setAssignmentEditForm({
+      title: '',
+      description: '',
+      date: '',
+      attachment: null,
+      removeAttachment: false
+    });
+  };
+
+  const handleUpdateAssignment = async (assignmentId) => {
+    if (!assignmentEditForm.title.trim() || !assignmentEditForm.description.trim() || !assignmentEditForm.date) {
+      setSubmitMessage({ type: 'error', text: 'Title, description, and date are required.' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage({ type: '', text: '' });
+
+    try {
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append("title", assignmentEditForm.title);
+      formData.append("description", assignmentEditForm.description);
+      formData.append("date", assignmentEditForm.date);
+
+      if (assignmentEditForm.attachment) {
+        formData.append("attachment", assignmentEditForm.attachment);
+      }
+
+      if (assignmentEditForm.removeAttachment) {
+        formData.append("removeAttachment", "true");
+      }
+
+      console.log('Updating assignment:', assignmentId, {
+        title: assignmentEditForm.title,
+        description: assignmentEditForm.description,
+        date: assignmentEditForm.date,
+        attachment: assignmentEditForm.attachment ? assignmentEditForm.attachment.name : null,
+        removeAttachment: assignmentEditForm.removeAttachment
+      });
+
+      const response = await axios.put(
+        `http://localhost:8086/api/v1/lecturer/${lecturerId}/assignment/${assignmentId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log('Update response:', response.data);
+      setSubmitMessage({ type: 'success', text: 'Assignment updated successfully!' });
+
+      // Cancel edit mode
+      handleCancelAssignmentEdit();
+
+      // Refresh assignments list
+      fetchAssignments();
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSubmitMessage({ type: '', text: '' });
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error updating assignment:', error);
+
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setSubmitMessage({
+          type: 'error',
+          text: error.response.data?.message || error.response.data || 'Failed to update assignment'
+        });
+      } else if (error.request) {
+        console.error('Network error:', error.request);
+        setSubmitMessage({
+          type: 'error',
+          text: 'Cannot connect to server. Please ensure the backend is running on port 8086.'
+        });
+      } else {
+        console.error('Request error:', error.message);
+        setSubmitMessage({
+          type: 'error',
+          text: 'An error occurred while updating the assignment.'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleDeleteAssignment = async (assignmentId) => {
     if (!window.confirm('Are you sure you want to delete this assignment? This action cannot be undone.')) {
       return;
@@ -443,9 +669,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Deleting assignment:', assignmentId);
 
       const response = await axios.delete(
@@ -500,8 +723,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      const lecturerId = userData?.id || 1;
-
       console.log('Deleting resource:', resourceId);
 
       const response = await axios.delete(
@@ -547,6 +768,112 @@ const Courses = () => {
     }
   };
 
+  // Edit resource functions
+  const handleEditResource = (resource) => {
+    setEditingResource(resource.resource_id);
+    setResourceEditForm({
+      file_name: resource.file_name,
+      attachment: null,
+      removeAttachment: false
+    });
+  };
+
+  const handleCancelResourceEdit = () => {
+    setEditingResource(null);
+    setResourceEditForm({
+      file_name: '',
+      attachment: null,
+      removeAttachment: false
+    });
+  };
+
+  const handleUpdateResource = async () => {
+    if (!resourceEditForm.file_name.trim()) {
+      setSubmitMessage({ type: 'error', text: 'File name is required.' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage({ type: '', text: '' });
+
+    try {
+      const formData = new FormData();
+
+      formData.append("file_name", resourceEditForm.file_name);
+
+      if (resourceEditForm.attachment) {
+        formData.append('attachment', resourceEditForm.attachment);
+      }
+
+      if (resourceEditForm.removeAttachment) {
+        formData.append('removeAttachment', 'true');
+      }
+
+      console.log('Updating resource:', {
+        resource_id: editingResource,
+        lecturer_id: lecturerId,
+        file_name: resourceEditForm.file_name,
+        attachment: resourceEditForm.attachment ? resourceEditForm.attachment.name : null,
+        removeAttachment: resourceEditForm.removeAttachment
+      });
+
+      const response = await axios.put(
+        `http://localhost:8086/api/v1/lecturer/${lecturerId}/resource/${editingResource}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log('Update response:', response.data);
+
+      setSubmitMessage({ type: 'success', text: 'Resource updated successfully!' });
+
+      // Reset edit state
+      setEditingResource(null);
+      setResourceEditForm({
+        file_name: '',
+        attachment: null,
+        removeAttachment: false
+      });
+
+      // Refresh resources list
+      fetchResources();
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSubmitMessage({ type: '', text: '' });
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error updating resource:', error);
+
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setSubmitMessage({
+          type: 'error',
+          text: error.response.data?.message || error.response.data || 'Failed to update resource'
+        });
+      } else if (error.request) {
+        console.error('Network error:', error.request);
+        setSubmitMessage({
+          type: 'error',
+          text: 'Cannot connect to server. Please ensure the backend is running on port 8086.'
+        });
+      } else {
+        console.error('Request error:', error.message);
+        setSubmitMessage({
+          type: 'error',
+          text: 'An error occurred while updating the resource.'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
 
 
   const handleAssignmentSubmit = async () => {
@@ -561,8 +888,6 @@ const Courses = () => {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
 
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", assignmentForm.course_id);
@@ -659,8 +984,6 @@ const Courses = () => {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
 
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", resourceForm.course_id);
@@ -776,7 +1099,8 @@ const Courses = () => {
                     setShowForm(!showForm);
                     setSubmitMessage({ type: '', text: '' });
                   }}
-                  className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
+                  disabled={editingAnnouncement !== null}
+                  className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-600"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add Announcement</span>
@@ -950,57 +1274,145 @@ const Courses = () => {
                         </span>
                       </div>
                       <div className="mb-3">
-                        <p className="leading-relaxed text-gray-800 whitespace-pre-wrap">
-                          {announcement.content}
-                        </p>
+                        {editingAnnouncement === announcement.announcement_id ? (
+                          // Edit Form
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                Content *
+                              </label>
+                              <textarea
+                                value={editForm.content}
+                                onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                rows={4}
+                                placeholder="Enter announcement content"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                Link (Optional)
+                              </label>
+                              <input
+                                type="url"
+                                value={editForm.link}
+                                onChange={(e) => setEditForm({ ...editForm, link: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="Enter link URL"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                Attachment (Optional)
+                              </label>
+                              <input
+                                type="file"
+                                onChange={(e) => setEditForm({ ...editForm, attachment: e.target.files[0] })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                accept="image/*,.pdf,.doc,.docx"
+                              />
+                              {announcement.attachment && (
+                                <div className="mt-2">
+                                  <label className="flex items-center space-x-2">
+                                    <input
+                                      type="checkbox"
+                                      checked={editForm.removeAttachment}
+                                      onChange={(e) => setEditForm({ ...editForm, removeAttachment: e.target.checked })}
+                                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-gray-600">Remove current attachment</span>
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleUpdateAnnouncement(announcement.announcement_id)}
+                                disabled={isSubmitting}
+                                className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {isSubmitting ? 'Updating...' : 'Update'}
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                disabled={isSubmitting}
+                                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          // Display Mode
+                          <p className="leading-relaxed text-gray-800 whitespace-pre-wrap">
+                            {announcement.content}
+                          </p>
+                        )}
                       </div>
 
                       {/* Link */}
-                      {announcement.link && (
-                        <div className="mb-3">
-                          <a
-                            href={announcement.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-800 hover:underline"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                            <span>View Link</span>
-                          </a>
-                        </div>
-                      )}
+                      {!editingAnnouncement || editingAnnouncement !== announcement.announcement_id ? (
+                        announcement.link && (
+                          <div className="mb-3">
+                            <a
+                              href={announcement.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                              <span>View Link</span>
+                            </a>
+                          </div>
+                        )
+                      ) : null}
 
                       {/* Attachment */}
-                      {announcement.attachment && (
-                        <div className="mb-3">
-                          <div className="flex items-center p-2 space-x-2 border rounded-lg bg-gray-50">
-                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                            </svg>
-                            <span className="text-sm text-gray-700">
-                              {announcement.attachment}
-                            </span>
-                            <button
-                              onClick={() => {
-                                // You can implement download functionality here
-                                console.log('Download attachment:', announcement.attachment);
-                              }}
-                              className="text-sm text-blue-600 hover:text-blue-800"
-                            >
-                              Download
-                            </button>
+                      {!editingAnnouncement || editingAnnouncement !== announcement.announcement_id ? (
+                        announcement.attachment && (
+                          <div className="mb-3">
+                            <div className="flex items-center p-2 space-x-2 border rounded-lg bg-gray-50">
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                              </svg>
+                              <span className="text-sm text-gray-700">
+                                {announcement.attachment}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  // You can implement download functionality here
+                                  console.log('Download attachment:', announcement.attachment);
+                                }}
+                                className="text-sm text-blue-600 hover:text-blue-800"
+                              >
+                                Download
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )
+                      ) : null}
                     </div>
 
                     {/* Actions */}
                     <div className="flex items-center ml-4 space-x-2">
                       <button
+                        onClick={() => handleEditAnnouncement(announcement)}
+                        disabled={isSubmitting || editingAnnouncement !== null}
+                        className="p-1 text-gray-500 transition-colors hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Edit"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
                         onClick={() => handleDeleteAnnouncement(announcement.announcement_id)}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || editingAnnouncement !== null}
                         className="p-1 text-gray-500 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete"
                       >
@@ -1266,46 +1678,136 @@ const Courses = () => {
                         <span className="px-3 py-1 text-sm font-medium text-purple-700 bg-purple-100 rounded-full">
                           ID: {assignment.assignment_id}
                         </span>
-                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${new Date(assignment.date) < new Date()
+                        {editingAssignment !== assignment.assignment_id && (
+                          <span className={`px-3 py-1 text-sm font-medium rounded-full ${new Date(assignment.date) < new Date()
                             ? 'text-red-700 bg-red-100'
                             : 'text-green-700 bg-green-100'
-                          }`}>
-                          Due: {new Date(assignment.date).toLocaleDateString()}
-                        </span>
+                            }`}>
+                            Due: {new Date(assignment.date).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
 
-                      <h4 className="mb-3 text-xl font-semibold text-gray-800">
-                        {assignment.title}
-                      </h4>
+                      {editingAssignment === assignment.assignment_id ? (
+                        // Edit Form
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                              Title *
+                            </label>
+                            <input
+                              type="text"
+                              value={assignmentEditForm.title}
+                              onChange={(e) => setAssignmentEditForm({ ...assignmentEditForm, title: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Enter assignment title"
+                            />
+                          </div>
 
-                      <div className="mb-4">
-                        <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
-                          {assignment.description}
-                        </p>
-                      </div>
+                          <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                              Description *
+                            </label>
+                            <textarea
+                              value={assignmentEditForm.description}
+                              onChange={(e) => setAssignmentEditForm({ ...assignmentEditForm, description: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              rows={4}
+                              placeholder="Enter assignment description"
+                            />
+                          </div>
 
-                      {/* Attachment */}
-                      {assignment.attachment && (
-                        <div className="mb-4">
-                          <div className="flex items-center p-3 space-x-3 border border-gray-200 rounded-lg bg-gray-50">
-                            <div className="flex items-center space-x-2">
-                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                              </svg>
-                              <span className="text-sm font-medium text-gray-700">
-                                Attachment: {assignment.attachment}
-                              </span>
-                            </div>
+                          <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                              Due Date *
+                            </label>
+                            <input
+                              type="date"
+                              value={assignmentEditForm.date}
+                              onChange={(e) => setAssignmentEditForm({ ...assignmentEditForm, date: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                              Attachment (Optional)
+                            </label>
+                            <input
+                              type="file"
+                              onChange={(e) => setAssignmentEditForm({ ...assignmentEditForm, attachment: e.target.files[0] })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              accept="image/*,.pdf,.doc,.docx"
+                            />
+                            {assignment.attachment && (
+                              <div className="mt-2">
+                                <label className="flex items-center space-x-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={assignmentEditForm.removeAttachment}
+                                    onChange={(e) => setAssignmentEditForm({ ...assignmentEditForm, removeAttachment: e.target.checked })}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                  />
+                                  <span className="text-sm text-gray-600">Remove current attachment</span>
+                                </label>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center space-x-2">
                             <button
-                              onClick={() => {
-                                // You can implement download functionality here
-                                console.log('Download attachment:', assignment.attachment);
-                              }}
-                              className="px-3 py-1 text-sm text-blue-600 transition-colors rounded hover:text-blue-800 hover:bg-blue-50"
+                              onClick={() => handleUpdateAssignment(assignment.assignment_id)}
+                              disabled={isSubmitting}
+                              className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Download
+                              {isSubmitting ? 'Updating...' : 'Update Assignment'}
+                            </button>
+                            <button
+                              onClick={handleCancelAssignmentEdit}
+                              disabled={isSubmitting}
+                              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Cancel
                             </button>
                           </div>
+                        </div>
+                      ) : (
+                        // Display Mode
+                        <div>
+                          <h4 className="mb-3 text-xl font-semibold text-gray-800">
+                            {assignment.title}
+                          </h4>
+
+                          <div className="mb-4">
+                            <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
+                              {assignment.description}
+                            </p>
+                          </div>
+
+                          {/* Attachment */}
+                          {assignment.attachment && (
+                            <div className="mb-4">
+                              <div className="flex items-center p-3 space-x-3 border border-gray-200 rounded-lg bg-gray-50">
+                                <div className="flex items-center space-x-2">
+                                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                  </svg>
+                                  <span className="text-sm font-medium text-gray-700">
+                                    Attachment: {assignment.attachment}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    // You can implement download functionality here
+                                    console.log('Download attachment:', assignment.attachment);
+                                  }}
+                                  className="px-3 py-1 text-sm text-blue-600 transition-colors rounded hover:text-blue-800 hover:bg-blue-50"
+                                >
+                                  Download
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -1331,11 +1833,9 @@ const Courses = () => {
                     {/* Actions */}
                     <div className="flex items-center ml-6 space-x-2">
                       <button
-                        onClick={() => {
-                          // You can implement edit functionality here
-                          console.log('Edit assignment:', assignment.assignment_id);
-                        }}
-                        className="p-2 text-gray-500 transition-colors hover:text-blue-600"
+                        onClick={() => handleEditAssignment(assignment)}
+                        disabled={isSubmitting || editingAssignment !== null}
+                        className="p-2 text-gray-500 transition-colors hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Edit"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1556,86 +2056,173 @@ const Courses = () => {
                   key={resource.resource_id}
                   className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center mb-2 space-x-2">
+                  {editingResource === resource.resource_id ? (
+                    /* Edit Form */
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-semibold text-gray-800">Edit Resource</h4>
                         <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
                           Course: {resource.course_id}
                         </span>
-                        <span className="text-xs text-gray-500">
-                          ID: {resource.resource_id}
-                        </span>
                       </div>
 
-                      <h4 className="mb-3 text-lg font-semibold text-gray-800">
-                        {resource.file_name}
-                      </h4>
+                      <div>
+                        <label className="block mb-2 text-sm font-medium text-gray-700">
+                          File Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={resourceEditForm.file_name}
+                          onChange={(e) => setResourceEditForm(prev => ({ ...prev, file_name: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter file name/title"
+                          disabled={isSubmitting}
+                        />
+                      </div>
 
-                      {/* Attachment */}
-                      {resource.attachment && (
-                        <div className="mb-3">
-                          <div className="flex items-center p-3 space-x-3 border border-gray-200 rounded-lg bg-gray-50">
-                            <div className="flex items-center space-x-2">
-                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                              </svg>
-                              <span className="text-sm font-medium text-gray-700">
-                                {resource.attachment}
-                              </span>
-                            </div>
+                      <div>
+                        <label className="block mb-2 text-sm font-medium text-gray-700">Update Attachment</label>
+                        <input
+                          type="file"
+                          onChange={(e) => setResourceEditForm(prev => ({ ...prev, attachment: e.target.files[0] }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          disabled={isSubmitting}
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          Leave empty to keep current attachment
+                        </p>
+                        {resourceEditForm.attachment && (
+                          <div className="flex items-center p-2 mt-2 space-x-2 rounded-lg bg-green-50">
+                            <span className="text-sm text-green-700">
+                              📎 {resourceEditForm.attachment.name}
+                            </span>
                             <button
-                              onClick={() => {
-                                // You can implement download functionality here
-                                console.log('Download attachment:', resource.attachment);
-                              }}
-                              className="px-3 py-1 text-sm text-blue-600 transition-colors rounded hover:text-blue-800 hover:bg-blue-50"
+                              type="button"
+                              onClick={() => setResourceEditForm(prev => ({ ...prev, attachment: null }))}
+                              className="text-red-500 hover:text-red-700"
+                              disabled={isSubmitting}
                             >
-                              Download
+                              ✕
                             </button>
                           </div>
+                        )}
+                      </div>
+
+                      {resource.attachment && (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`remove-attachment-${resource.resource_id}`}
+                            checked={resourceEditForm.removeAttachment}
+                            onChange={(e) => setResourceEditForm(prev => ({ ...prev, removeAttachment: e.target.checked }))}
+                            className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                            disabled={isSubmitting}
+                          />
+                          <label htmlFor={`remove-attachment-${resource.resource_id}`} className="text-sm text-gray-700">
+                            Remove current attachment ({resource.attachment})
+                          </label>
                         </div>
                       )}
-                    </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center ml-4 space-x-2">
-                      <button
-                        onClick={() => {
-                          // You can implement edit functionality here
-                          console.log('Edit resource:', resource.resource_id);
-                        }}
-                        className="p-1 text-gray-500 transition-colors hover:text-blue-600"
-                        title="Edit"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteResource(resource.resource_id)}
-                        disabled={isSubmitting}
-                        className="p-1 text-gray-500 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Delete"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={handleUpdateResource}
+                          disabled={isSubmitting}
+                          className="flex-1 px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSubmitting ? 'Updating...' : 'Update Resource'}
+                        </button>
+                        <button
+                          onClick={handleCancelResourceEdit}
+                          disabled={isSubmitting}
+                          className="flex-1 px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* Display Mode */
+                    <>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center mb-2 space-x-2">
+                            <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
+                              Course: {resource.course_id}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ID: {resource.resource_id}
+                            </span>
+                          </div>
 
-                  {/* Timestamp */}
-                  <div className="flex items-center justify-between pt-3 text-xs text-gray-500 border-t border-gray-100">
-                    <span>
-                      {resource.created_at
-                        ? `Uploaded on ${new Date(resource.created_at).toLocaleDateString()} at ${new Date(resource.created_at).toLocaleTimeString()}`
-                        : 'Recently uploaded'
-                      }
-                    </span>
-                    <span className="px-2 py-1 text-green-800 bg-green-100 rounded-full">
-                      Available
-                    </span>
-                  </div>
+                          <h4 className="mb-3 text-lg font-semibold text-gray-800">
+                            {resource.file_name}
+                          </h4>
+
+                          {/* Attachment */}
+                          {resource.attachment && (
+                            <div className="mb-3">
+                              <div className="flex items-center p-3 space-x-3 border border-gray-200 rounded-lg bg-gray-50">
+                                <div className="flex items-center space-x-2">
+                                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                  </svg>
+                                  <span className="text-sm font-medium text-gray-700">
+                                    {resource.attachment}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    // You can implement download functionality here
+                                    console.log('Download attachment:', resource.attachment);
+                                  }}
+                                  className="px-3 py-1 text-sm text-blue-600 transition-colors rounded hover:text-blue-800 hover:bg-blue-50"
+                                >
+                                  Download
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center ml-4 space-x-2">
+                          <button
+                            onClick={() => handleEditResource(resource)}
+                            className="p-1 text-gray-500 transition-colors hover:text-blue-600"
+                            title="Edit"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteResource(resource.resource_id)}
+                            disabled={isSubmitting}
+                            className="p-1 text-gray-500 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Delete"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Timestamp */}
+                      <div className="flex items-center justify-between pt-3 text-xs text-gray-500 border-t border-gray-100">
+                        <span>
+                          {resource.created_at
+                            ? `Uploaded on ${new Date(resource.created_at).toLocaleDateString()} at ${new Date(resource.created_at).toLocaleTimeString()}`
+                            : 'Recently uploaded'
+                          }
+                        </span>
+                        <span className="px-2 py-1 text-green-800 bg-green-100 rounded-full">
+                          Available
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -1820,7 +2407,11 @@ const Courses = () => {
                     setAssignmentForm({ course_id: '', title: '', description: '', due_date: '', attachment: null });
                     setResourceForm({ course_id: '', file_name: '', attachment: null });
                     setEditingAnnouncement(null);
+                    setEditingAssignment(null);
+                    setEditingResource(null);
                     setEditAnnouncementForm({ announcement_id: '', course_id: '', content: '', link: '', attachment: null, hasAttachment: false });
+                    setAssignmentEditForm({ title: '', description: '', date: '', attachment: null, removeAttachment: false });
+                    setResourceEditForm({ file_name: '', attachment: null, removeAttachment: false });
                     setSubmitMessage({ type: '', text: '' });
                     // Clear file inputs
                     const fileInputs = document.querySelectorAll('input[type="file"]');

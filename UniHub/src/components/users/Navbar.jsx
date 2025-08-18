@@ -19,7 +19,9 @@ import { useAuth } from '../../contexts/AuthContexts'; // adjust path as needed
 import unihubLogo from '../../assets/unihub_logo.jpeg';
 
 const Navbar = () => {
-  const { isLoggedIn, userRole, userId, logout } = useAuth();
+
+  const { isLoggedIn, userRole, userId,studentId,lecturerId, logout } = useAuth();
+
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -35,24 +37,17 @@ const Navbar = () => {
   const getNavigationItems = () => {
     if (!isLoggedIn || !normalizedUserRole) return [];
 
-    if (normalizedUserRole === 'admin') {
-      return [
-        { path: `/admin/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
-        { path: `/admin/${userId}/users`, icon: Users, label: 'Manage Users' },
-        { path: `/admin/${userId}/notifications`, icon: Bell, label: 'Notifications' },
-        { path: `/admin/${userId}/profile`, icon: User, label: 'Profile' },
-      ];
-    }
+
 
     if (normalizedUserRole === 'lecturer') {
       return [
 
 
-        { path: `/lecturer/${userId}/home`, icon: Home, label: 'Dashboard' },
-        { path: `/lecturer/${userId}/courses`, icon: BookMarked, label: 'Courses' },
-        { path: `/lecturer/${userId}/appointments`, icon: Calendar, label: 'Appointments' },
-        { path: `/lecturer/${userId}/notifications`, icon: Bell, label: 'Notifications' },
-        { path: `/lecturer/${userId}/profile`, icon: User, label: 'Profile' },
+        { path: `/lecturer/${lecturerId}/home`, icon: Home, label: 'Dashboard' },
+        { path: `/lecturer/${lecturerId}/courses`, icon: BookMarked, label: 'Courses' },
+        { path: `/lecturer/${lecturerId}/appointments`, icon: Calendar, label: 'Appointments' },
+        { path: `/lecturer/${lecturerId}/notifications`, icon: Bell, label: 'Notifications' },
+        { path: `/lecturer/${lecturerId}/profile`, icon: User, label: 'Profile' },
 
       ];
     }
@@ -61,13 +56,15 @@ const Navbar = () => {
       return [
 
 
-        { path: `/student/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
-        { path: `/student/${userId}/courses`, icon: BookMarked, label: 'My Courses' },
-        { path: `/student/${userId}/appointments`, icon: Calendar, label: 'Appointments' },
-        { path: `/student/${userId}peer-learning`, icon: Users, label: 'Peer Learning' },
-        { path: `/student/${userId}/queries`, icon: MessageSquare, label: 'Queries' },
-        { path: `/student/${userId}/announcements`, icon: Bell, label: 'Announcements' },
-        { path: `/student/${userId}/profile`, icon: User, label: 'Profile' },
+
+        { path: `/student/${studentId}/dashboard`, icon: Home, label: 'Dashboard' },
+        { path: `/student/${studentId}/courses`, icon: BookMarked, label: 'My Courses' },
+        { path: `/student/${studentId}/appointments`, icon: Calendar, label: 'Appointments' },
+        { path: `/student/${studentId}peer-learning`, icon: Users, label: 'Peer Learning' },
+        { path: `/student/${studentId}/queries`, icon: MessageSquare, label: 'Queries' },
+        { path: `/student/${studentId}/announcements`, icon: Bell, label: 'Announcements' },
+
+        { path: `/student/${studentId}/profile`, icon: User, label: 'Profile' },
 
 
       ];
