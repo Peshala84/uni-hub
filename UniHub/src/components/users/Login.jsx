@@ -27,7 +27,7 @@ const Login = () => {
       if (role === 'lecturer') {
         navigate('/lecturer');
       } else {
-        navigate('/student/dashboard');
+        navigate('/student/home');
       }
     }, 1000);
   };

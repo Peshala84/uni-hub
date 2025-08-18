@@ -11,6 +11,7 @@ const StudentQueries = ({ courseId, courseName }) => {
   const [error, setError] = useState(null);
   const [newQuery, setNewQuery] = useState({ category: '', priority: '', question: '' });
   const [selectedFeedback, setSelectedFeedback] = useState({});
+  const [popup, setPopup] = useState({ show: false, message: '', type: 'success' });
 
   // DEBUG: Log props when component receives them
   useEffect(() => {
@@ -76,14 +77,14 @@ const StudentQueries = ({ courseId, courseName }) => {
     // Validate course selection
     if (!courseId || isNaN(Number(courseId))) {
       console.log('Submit blocked - invalid courseId');
-      alert('Please select a valid course before submitting your query.');
+      setPopup({ show: true, message: 'Please select a valid course before submitting your query.', type: 'error' });
       return;
     }
 
     // Validate form inputs
     if (!newQuery.category || !newQuery.priority || !newQuery.question.trim()) {
       console.log('Submit blocked - incomplete form');
-      alert('Please fill in all fields before submitting.');
+      setPopup({ show: true, message: 'Please fill in all fields before submitting.', type: 'error' });
       return;
     }
 
@@ -116,7 +117,7 @@ const StudentQueries = ({ courseId, courseName }) => {
       setQueries(queriesResponse.data || []);
 
       // Show success message
-      alert('Query submitted successfully!');
+      setPopup({ show: true, message: 'Query submitted successfully!', type: 'success' });
 
     } catch (error) {
       console.error('Error submitting query:', error);
@@ -132,9 +133,9 @@ const StudentQueries = ({ courseId, courseName }) => {
       // More detailed error message
       if (error.response) {
         console.error('Error response:', error.response.data);
-        alert(`Failed to submit query: ${error.response.data.message || error.response.statusText}`);
+        setPopup({ show: true, message: `Failed to submit query: ${error.response.data.message || error.response.statusText}`, type: 'error' });
       } else {
-        alert('Failed to submit query. Please check your connection and try again.');
+        setPopup({ show: true, message: 'Failed to submit query. Please check your connection and try again.', type: 'error' });
       }
     } finally {
       setSubmitting(false);
@@ -185,8 +186,36 @@ const StudentQueries = ({ courseId, courseName }) => {
     return 'bg-gradient-to-r from-amber-500/10 to-amber-600/10 text-amber-700 border-amber-200';
   };
 
+  // Popup notification component
+  const Popup = ({ show, message, type, onClose }) => {
+    if (!show) return null;
+    return (
+      <div className={`fixed left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 mt-20 rounded-xl shadow-lg flex items-center space-x-3 transition-all duration-300
+        ${type === 'success' ? 'bg-green-100 border border-green-300 text-green-800' : 'bg-red-100 border border-red-300 text-red-800'}`}
+        style={{ minWidth: '300px', maxWidth: '90vw', top: '0.5rem' }}
+      >
+        {type === 'success' ? (
+          <CheckCircle className="w-6 h-6 text-green-500" />
+        ) : (
+          <AlertTriangle className="w-6 h-6 text-red-500" />
+        )}
+        <span className="flex-1 font-medium">{message}</span>
+        <button onClick={onClose} className="ml-4 text-lg font-bold text-gray-500 hover:text-gray-800">&times;</button>
+      </div>
+    );
+  };
+
+  // Auto-close popup after 3s
+  useEffect(() => {
+    if (popup.show) {
+      const timer = setTimeout(() => setPopup(p => ({ ...p, show: false })), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [popup.show]);
+
   return (
     <div className="space-y-8">
+      <Popup show={popup.show} message={popup.message} type={popup.type} onClose={() => setPopup(p => ({ ...p, show: false }))} />
       
 
       {/* Header */}

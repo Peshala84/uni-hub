@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, Home, LogIn, BookMarked, Bell, User, Menu, X, Calendar, MessageSquare, Users, GraduationCap } from 'lucide-react';
+import UniHubLogo from '../../assets/unihub_logo.jpg';
 import { useAuth } from '../../contexts/AuthContexts';
 
 const Navbar = () => {
@@ -30,7 +31,7 @@ const Navbar = () => {
 
     if (userRole === 'student') {
       return [
-        { path: '/student/dashboard', icon: Home, label: 'Dashboard' },
+        { path: '/student/home', icon: Home, label: 'Home' },
         { path: '/student/courses', icon: BookMarked, label: 'My Courses' },
         { path: '/student/appointments', icon: Calendar, label: 'Appointments' },
         { path: '/student/peer-learning', icon: Users, label: 'Peer Learning' },
@@ -49,14 +50,8 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="p-2 transition-colors bg-blue-600 rounded-lg group-hover:bg-blue-700">
-              {userRole === 'lecturer' ? (
-                <GraduationCap className="w-6 h-6 text-white" />
-              ) : userRole === 'student' ? (
-                <BookOpen className="w-6 h-6 text-white" />
-              ) : (
-                <BookOpen className="w-6 h-6 text-white" />
-              )}
+            <div className="p-1 bg-white rounded-lg shadow group-hover:bg-gray-100 transition-colors">
+              <img src={UniHubLogo} alt="UniHub Logo" className="w-10 h-10 object-contain" />
             </div>
             <span className="text-xl font-bold text-gray-800 transition-colors group-hover:text-blue-600">
               {userRole === 'lecturer' ? 'UniHub - Lecturer' : userRole === 'student' ? 'UniHub - Student' : 'UniHub'}
