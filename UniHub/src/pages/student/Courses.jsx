@@ -3,22 +3,43 @@ import { GraduationCap, BookOpen, HelpCircle, Star } from 'lucide-react';
 
 
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StudentQueries from './StudentQueries';
 import Resources from './Resources';
 import FeedbackForum from './FeedbackForum';
+import axios from 'axios';
 
-const mockCourses = [
-    { id: 'cs101', name: 'CS101 - Introduction to Computer Science' },
-    { id: 'math201', name: 'MATH201 - Calculus II' },
-    { id: 'phy110', name: 'PHY110 - Physics Fundamentals' }
-];
+
+
 
 const StudentCourses = () => {
-    const [selectedCourse, setSelectedCourse] = React.useState('');
-    const [activeTab, setActiveTab] = React.useState('queries');
+    const [selectedCourse, setSelectedCourse] = useState('');
+    const [activeTab, setActiveTab] = useState('queries');
+    const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await axios.get('http://localhost:8086/api/v1/student/1/courses');
+                console.log('Fetched courses response:', response);
+                // Adjust the response data path if needed
+                console.log('Courses array:', response.data);
+                setCourses(response.data);
+            } catch (err) {
+                setError('Failed to load courses');
+                console.error('Error fetching courses:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCourses();
+    }, []);
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -55,16 +76,31 @@ const StudentCourses = () => {
                 {/* Course Selection */}
                 <div className="mb-8">
                     <label className="block text-lg font-semibold text-[#132D46] mb-2">Select a Course</label>
-                    <select
-                        value={selectedCourse}
-                        onChange={e => setSelectedCourse(e.target.value)}
-                        className="w-full md:w-1/2 border-2 border-[#2CC295]/30 rounded-xl px-4 py-3 text-[#132D46] font-medium focus:border-[#2CC295] focus:ring-4 focus:ring-[#2CC295]/20 transition-all duration-200"
-                    >
-                        <option value="">-- Choose a course --</option>
-                        {mockCourses.map(course => (
-                            <option key={course.id} value={course.id}>{course.name}</option>
-                        ))}
-                    </select>
+                    {loading ? (
+                        <div className="text-[#2CC295] font-medium">Loading courses...</div>
+                    ) : error ? (
+                        <div className="text-red-500 font-medium">{error}</div>
+                    ) : (
+                        courses.length === 0 ? (
+                            <div className="text-[#696E79] font-medium">No courses available.</div>
+                        ) : (
+                            <select
+                                value={selectedCourse}
+                                onChange={e => setSelectedCourse(e.target.value)}
+                                className="w-full md:w-1/2 border-2 border-[#2CC295]/30 rounded-xl px-4 py-3 text-[#132D46] font-medium focus:border-[#2CC295] focus:ring-4 focus:ring-[#2CC295]/20 transition-all duration-200"
+                            >
+                                <option value="">-- Choose a course --</option>
+                                {courses.map((course, idx) => {
+                                    console.log('Course object:', course);
+                                    return (
+                                        <option key={course.courseId || course.id || idx} value={course.courseId || course.id}>
+                                            {course.name || course.courseName || course.title || JSON.stringify(course)}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        )
+                    )}
                 </div>
 
                 {/* Show navigation and tabs only if a course is selected */}

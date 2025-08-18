@@ -3,28 +3,28 @@ import React, { useState } from 'react';
 import { MessageCircle, Send, User, Heart, MessageSquare, Star, ThumbsUp, Clock } from 'lucide-react';
 
 const mockFeedbacks = [
-  { 
-    id: 1, 
-    user: 'Sarah Johnson', 
-    content: 'The course material is excellent! The explanations are clear and the examples really help understand complex concepts. I especially appreciate the practical assignments.', 
+  {
+    id: 1,
+    user: 'Sarah Johnson',
+    content: 'The course material is excellent! The explanations are clear and the examples really help understand complex concepts. I especially appreciate the practical assignments.',
     comments: ['I completely agree! The hands-on approach makes learning so much easier.', 'Yes, the real-world examples are fantastic.'],
     timestamp: '2 hours ago',
     likes: 12,
     avatar: 'SJ'
   },
-  { 
-    id: 2, 
-    user: 'Michael Chen', 
-    content: 'Can we have more interactive sessions during lectures? Sometimes it gets difficult to follow when it\'s just one-way communication. Maybe some Q&A sessions would help.', 
+  {
+    id: 2,
+    user: 'Michael Chen',
+    content: 'Can we have more interactive sessions during lectures? Sometimes it gets difficult to follow when it\'s just one-way communication. Maybe some Q&A sessions would help.',
     comments: ['Great suggestion! Interactive sessions would be amazing.'],
     timestamp: '5 hours ago',
     likes: 8,
     avatar: 'MC'
   },
-  { 
-    id: 3, 
-    user: 'Emily Rodriguez', 
-    content: 'The online resources are comprehensive, but I think we could benefit from more video tutorials for the programming assignments. Visual learning really helps!', 
+  {
+    id: 3,
+    user: 'Emily Rodriguez',
+    content: 'The online resources are comprehensive, but I think we could benefit from more video tutorials for the programming assignments. Visual learning really helps!',
     comments: [],
     timestamp: '1 day ago',
     likes: 15,
@@ -41,7 +41,7 @@ const FeedbackForum = () => {
   const handleFeedbackSubmit = (e) => {
     e.preventDefault();
     if (!newFeedback.trim()) return;
-    
+
     setFeedbacks([
       {
         id: feedbacks.length + 1,
@@ -63,7 +63,7 @@ const FeedbackForum = () => {
 
   const handleCommentSubmit = (id) => {
     if (!comment[id]?.trim()) return;
-    
+
     setFeedbacks(
       feedbacks.map(f =>
         f.id === id ? { ...f, comments: [...f.comments, comment[id]] } : f
@@ -75,20 +75,20 @@ const FeedbackForum = () => {
   const handleLike = (id) => {
     const newLikedPosts = new Set(likedPosts);
     const isLiked = likedPosts.has(id);
-    
+
     if (isLiked) {
       newLikedPosts.delete(id);
     } else {
       newLikedPosts.add(id);
     }
-    
+
     setLikedPosts(newLikedPosts);
-    
+
     setFeedbacks(
       feedbacks.map(f =>
-        f.id === id ? { 
-          ...f, 
-          likes: isLiked ? f.likes - 1 : f.likes + 1 
+        f.id === id ? {
+          ...f,
+          likes: isLiked ? f.likes - 1 : f.likes + 1
         } : f
       )
     );
@@ -191,11 +191,10 @@ const FeedbackForum = () => {
               <div className="flex items-center space-x-6">
                 <button
                   onClick={() => handleLike(feedback.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${
-                    likedPosts.has(feedback.id)
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${likedPosts.has(feedback.id)
                       ? 'bg-[#2CC295] text-white shadow-lg'
                       : 'bg-white text-[#132D46] hover:bg-[#2CC295]/10 border border-[#191E29]/10'
-                  }`}
+                    }`}
                 >
                   <ThumbsUp className="w-4 h-4" />
                   <span>{feedback.likes}</span>

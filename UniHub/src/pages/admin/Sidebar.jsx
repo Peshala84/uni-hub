@@ -15,6 +15,8 @@ import {
   Circle
 } from 'lucide-react';
 
+import LOGO from '../../assets/Logo.jpeg';
+
 const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [animationPhase, setAnimationPhase] = useState(0);
@@ -124,12 +126,14 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
           {/* Logo Section */}
           <div className="flex items-center space-x-3 sm:space-x-4 mb-8 sm:mb-10 group">
             <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#01C38D] to-[#01C38D]/80 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xl shadow-[#01C38D]/30 group-hover:scale-110 transition-all duration-300">
-                <GraduationCap className="text-white" size={sidebarOpen ? 28 : 24} />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#01C38D] to-[#01C38D]/80 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xl shadow-[#01C38D]/30 group-hover:scale-110 transition-all duration-300 overflow-hidden">
+                <img 
+                  src={LOGO} 
+                  alt="UniHUB Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
-              {/* Pulsing ring */}
-              <div className="absolute inset-0 bg-[#01C38D]/30 rounded-xl sm:rounded-2xl animate-ping" />
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#01C38D]/20 to-transparent rounded-xl sm:rounded-2xl blur-lg" />
+              
             </div>
             
             {sidebarOpen && (
@@ -149,22 +153,6 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
           {/* Quick Actions Toggle */}
           {sidebarOpen && (
             <div className="mb-6 sm:mb-8">
-              <button
-                onClick={() => setQuickActions(!quickActions)}
-                className="w-full flex items-center justify-between p-2.5 sm:p-3 bg-gradient-to-r from-[#01C38D]/10 to-[#132D46]/20 border border-[#01C38D]/20 rounded-xl sm:rounded-2xl hover:from-[#01C38D]/20 hover:to-[#132D46]/30 transition-all duration-300 group"
-              >
-                <div className="flex items-center space-x-2.5 sm:space-x-3">
-                  <Zap size={16} className="text-[#01C38D] group-hover:animate-pulse" />
-                  <span className="text-white font-medium text-sm sm:text-base">Quick Actions</span>
-                </div>
-                <ChevronRight 
-                  size={14} 
-                  className={`text-[#696E79] transition-transform duration-300 ${
-                    quickActions ? 'rotate-90' : ''
-                  }`} 
-                />
-              </button>
-              
               {quickActions && (
                 <div className="mt-3 space-y-2 animate-in slide-in-from-top duration-200">
                   <button className="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-[#696E79] hover:text-[#01C38D] hover:bg-[#01C38D]/5 rounded-lg transition-all">
