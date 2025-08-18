@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [studentId, setStudentId] = useState(null);
+  const [lecturerId, setLecturerId] = useState(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token"); // 👈 only read here
@@ -23,12 +25,16 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(true);
         setUserRole(decoded.role.toLowerCase());
         setUserId(decoded.userId);
+        setStudentId(decoded.studentId || null); // handle studentId if exists
+        setLecturerId(decoded.lecturerId || null); // handle lecturerId if exists
       } catch (err) {
         console.error('Invalid token:', err);
         sessionStorage.removeItem('token');
         setIsLoggedIn(false);
         setUserRole(null);
         setUserId(null);
+        setStudentId(null);
+        setLecturerId(null);
       }
     }
     setLoading(false);
@@ -41,11 +47,15 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(true);
       setUserRole(decoded.role.toLowerCase());
       setUserId(decoded.userId);
+      setStudentId(decoded.studentId || null); // handle studentId if exists
+      setLecturerId(decoded.lecturerId || null); // handle lecturerId if exists
     } catch (err) {
       console.error('Login failed: invalid token', err);
       setIsLoggedIn(false);
       setUserRole(null);
       setUserId(null);
+      setStudentId(null);
+      setLecturerId(null);
       sessionStorage.removeItem('token');
     }
   };
@@ -55,10 +65,12 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     setUserRole(null);
     setUserId(null);
+    setStudentId(null);
+    setLecturerId(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userRole, userId, login, logout, loading }}>
+    <AuthContext.Provider value={{ isLoggedIn, userRole, userId,studentId,lecturerId, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
