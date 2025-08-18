@@ -43,7 +43,7 @@ const Login = () => {
       } else if (userRole === 'lecturer') {
         navigate(`/lecturer/${lecturerId}/home`);
       } else if (userRole === 'student') {
-        navigate(`/student/${studentId}/dashboard`);
+        navigate(`/student/${studentId}/home`);
       } else {
         navigate('/unauthorized');
       }
