@@ -40,7 +40,9 @@ function App() {
 
 
             <Route
-              path="/lecturer/:studentId/*"
+]
+              path="/lecturer/:lecturerId/*"
+]
               element={
                 <ProtectedRoute>
                   <Lecturer /> {/* Your student component/routes */}
