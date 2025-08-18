@@ -6,6 +6,7 @@ import DashboardHome from './DashboardHome';
 import AddUser from './AddUser';
 import ViewStudents from './ViewStudents';
 import ViewLecturers from './ViewLecturers';
+import Courses from './Courses'; 
 import ComingSoon from './ComingSoon';
 import AddAnnouncements from './Anouncements';
 import axios from 'axios';
@@ -108,6 +109,8 @@ const AdminDashboard = () => {
         );
       case 'announcements':
         return <AddAnnouncements />;
+      case 'courses':
+        return <Courses />;
       default:
         return <ComingSoon />;
     }

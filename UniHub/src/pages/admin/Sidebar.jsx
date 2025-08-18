@@ -52,11 +52,11 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
       description: 'Faculty Overview'
     },
     { 
-      id: 'queries', 
-      label: 'Queries', 
+      id: 'courses', 
+      label: 'Courses', 
       icon: MessageSquare, 
       color: '#EF4444',
-      description: 'Support Tickets'
+      description: 'Add Courses'
     },
     { 
       id: 'announcements', 

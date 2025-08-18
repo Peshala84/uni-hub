@@ -53,7 +53,47 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+
+    // Debug: Log token details
+    console.log('Received Token:', token);
+
+    // Update auth context
+    login(token);
+
+    // Decode token to get role and userId
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    console.log('Decoded Token:', decoded);
+    
+    const userRole = decoded.role.toLowerCase().trim();
+    const userId = decoded.userId;
+    const lecturerId = decoded.lecturerId || null;
+    const studentId = decoded.studentId || null;
+
+    console.log('Navigation Info:', { userRole, userId, lecturerId, studentId });
+
+    // Navigate based on user role
+    if (userRole === 'admin') {
+      navigate(`/admin/${userId}`);
+    } else if (userRole === 'lecturer') {
+      navigate(`/lecturer/${lecturerId}/home`);
+    } else if (userRole === 'student') {
+      navigate(`/student/${studentId}/dashboard`);
+    } else {
+      navigate('/unauthorized');
+    }
+  } catch (error) {
+    // Enhanced error debugging
+    console.error('Login failed - Full Error:', error);
+    console.error('Error Response:', error.response?.data);
+    console.error('Error Status:', error.response?.status);
+    console.error('Error Headers:', error.response?.headers);
+    console.error('Error Config:', error.config);
+    
+    setErrorMessage('Invalid email or password.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
