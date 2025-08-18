@@ -1,100 +1,185 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, CheckCircle, AlertCircle, Search, Send, MapPin, MessageSquare } from 'lucide-react';
-
-const mockAppointments = [
-    { 
-        id: 1, 
-        lecturer: 'Dr. Smith', 
-        date: '2024-08-01', 
-        time: '10:00', 
-        reason: 'Discuss final project requirements and timeline', 
-        status: 'Confirmed',
-        location: 'Room 203, Engineering Building',
-        duration: '30 minutes'
-    },
-    { 
-        id: 2, 
-        lecturer: 'Prof. Lee', 
-        date: '2024-08-03', 
-        time: '14:00', 
-        reason: 'Need help with assignment 3 - data structures', 
-        status: 'Pending',
-        location: 'Room 156, Computer Science Building',
-        duration: '45 minutes'
-    },
-    { 
-        id: 3, 
-        lecturer: 'Dr. Johnson', 
-        date: '2024-07-28', 
-        time: '09:30', 
-        reason: 'Career guidance and research opportunities', 
-        status: 'Completed',
-        location: 'Room 301, Faculty Office',
-        duration: '60 minutes'
-    }
-];
-
-const lecturersList = [
-    { name: 'Dr. Smith', department: 'Computer Science', expertise: 'Software Engineering' },
-    { name: 'Prof. Lee', department: 'Computer Science', expertise: 'Data Structures & Algorithms' },
-    { name: 'Dr. Johnson', department: 'Information Technology', expertise: 'Database Systems' },
-    { name: 'Prof. Williams', department: 'Computer Science', expertise: 'Machine Learning' },
-    { name: 'Dr. Brown', department: 'Information Systems', expertise: 'Cybersecurity' },
-    { name: 'Prof. Miller', department: 'Software Engineering', expertise: 'Web Development' }
-];
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const Appointments = () => {
-    const [appointments, setAppointments] = useState(mockAppointments);
-    const [form, setForm] = useState({ lecturer: '', date: '', time: '', reason: '', duration: '30' });
+    const [appointments, setAppointments] = useState([]);
+    const [form, setForm] = useState({ lecturer: '', date: '', time: '', purpose: '', status: 'PENDING' });
     const [lecturerSearch, setLecturerSearch] = useState('');
     const [showLecturerDropdown, setShowLecturerDropdown] = useState(false);
+    const [lecturersList, setLecturersList] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [lecturerId, setLecturerId] = useState(null);
+    const { studentId } = useParams();
+
+    useEffect(() => {
+        axios.get('http://localhost:8086/api/v1/student/lecturers')
+            .then(response => {
+                setLecturersList(response.data);
+                console.log('Lecturers fetched:', response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching lecturers:', error);
+            });
+    }, []);
+
+    useEffect(() => {
+        axios.get(`http://localhost:8086/api/v1/student/appointments/${studentId}`)
+            .then(response => {
+                setAppointments(response.data);
+                console.log('Appointments fetched:', response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching appointments:', error);
+            });
+    }, [studentId]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+
+    // Synchronize input and lecturer search state and control dropdown visibility
     const handleLecturerSearch = (e) => {
         const value = e.target.value;
         setLecturerSearch(value);
-        setForm({ ...form, lecturer: value });
-        setShowLecturerDropdown(value.length > 0);
+        setForm({ ...form, lecturer: value, lecturerId: null });
+        setShowLecturerDropdown(value.trim().length > 0);
     };
 
-    const filteredLecturers = lecturersList.filter(l =>
-        l.name.toLowerCase().includes(lecturerSearch.toLowerCase()) ||
-        l.department.toLowerCase().includes(lecturerSearch.toLowerCase()) ||
-        l.expertise.toLowerCase().includes(lecturerSearch.toLowerCase())
-    );
 
+    // Filter lecturers by f_name or l_name, case insensitive
+    const filteredLecturers = lecturersList.filter(lecturer => {
+        const search = lecturerSearch.toLowerCase();
+        return (lecturer.userDTO?.f_name?.toLowerCase().includes(search) || lecturer.userDTO?.l_name?.toLowerCase().includes(search));
+    });
+
+    // When selecting a lecturer from dropdown, set form and input state and hide dropdown
     const handleLecturerSelect = (lecturer) => {
-        setForm({ ...form, lecturer: lecturer.name });
-        setLecturerSearch(lecturer.name);
+        const fullName = `${lecturer.userDTO?.f_name} ${lecturer.userDTO?.l_name}`;
+        setForm({ ...form, lecturerId: lecturer.lecturer_id, lecturer: fullName });
+        setLecturerId(lecturer.lecturer_id);
+        setForm(prev => ({ ...prev, lecturer: fullName }));
+        setLecturerSearch(fullName);
         setShowLecturerDropdown(false);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setAppointments([
-            ...appointments,
-            { 
-                id: appointments.length + 1, 
-                ...form, 
-                status: 'Pending',
-                location: 'TBD',
-                duration: form.duration + ' minutes'
-            }
-        ]);
-        setForm({ lecturer: '', date: '', time: '', reason: '', duration: '30' });
-        setLecturerSearch('');
+        if (!form.lecturerId) {
+            alert('Please select a lecturer from the dropdown.');
+            return;
+        }
+        if (!form.date) {
+            alert('Please select a date.');
+            return;
+        }
+        if (!form.time) {
+            alert('Please select a time.');
+            return;
+        }
+        if (!form.purpose || form.purpose.trim() === '') {
+            alert('Please enter the purpose of your appointment.');
+            return;
+        }
+        // Ensure time is in HH:mm:ss format:
+        let timeWithSeconds = form.time;
+        if (form.time.length === 5) { // e.g. "14:00"
+            timeWithSeconds = form.time + ":00";
+        }
+
+        const payload = {
+            student_id: Number(studentId),
+            lecturer_id: form.lecturerId,
+            date: form.date,
+            time: timeWithSeconds,
+            purpose: form.purpose,
+            status: 'PENDING'
+        };
+        console.log('Submitting payload:', payload);
+
+        axios.post('http://localhost:8086/api/v1/student/appointment', payload)
+            .then(response => {
+                console.log('Appointment booked:', response.data);
+                setAppointments([...appointments, response.data]);
+                setForm({ lecturerId: null, lecturer: '', date: '', time: '', purpose: '', status: 'PENDING' });
+                setLecturerSearch('');
+            })
+            .catch(error => {
+                console.error('Error booking appointment:', error.response?.data || error.message);
+                alert('Failed to book appointment: ' + (error.response?.data?.message || error.message));
+            });
     };
+
+    const handleUpdate = (e) => {
+        e.preventDefault();
+        // Ensure time is in HH:mm:ss format:
+        let timeWithSeconds = form.time;
+        if (form.time.length === 5) { // e.g. "14:00"
+            timeWithSeconds = form.time + ":00";
+        }
+        const payload = {
+            appointment_id: form.appointment_id,
+            student_id: Number(studentId),
+            lecturer_id: form.lecturerId,
+            date: form.date,
+            time: timeWithSeconds,
+            purpose: form.purpose,
+            status: 'PENDING'
+        };
+        console.log('Updating payload:', payload);
+        axios.put(`http://localhost:8086/api/v1/student/appointment`, payload)
+            .then(response => {
+                console.log('Appointment updated:', response.data);
+                setAppointments(appointments.map(app => app.appointment_id === form.appointment_id ? response.data : app));
+                setForm({ lecturerId: null, lecturer: '', date: '', time: '', purpose: '', status: 'PENDING' });
+                setLecturerSearch('');
+                alert('Appointment updated successfully');
+                window.location.reload(); // Reload to reflect changes
+            })
+            .catch(error => {
+                console.error('Error updating appointment:', error.response?.data || error.message);
+                alert('Failed to update appointment: ' + (error.response?.data?.message || error.message));
+            });
+    };
+
+
+    const handleEditClick = (appointment) => {
+        setForm({
+            appointment_id: appointment.appointment_id,
+            lecturer_id: appointment.lecturer_id,
+            lecturer: '', // or full name if you prefer
+            date: appointment.date,
+            time: appointment.time,
+            purpose: appointment.purpose,
+            status: appointment.status,
+            appointment_id: appointment.appointment_id
+        });
+        setLecturerSearch('');
+        setIsEditing(true);  // show the form
+    };
+
+
+    const handleDelete = (appointmentId) => {
+        axios.delete(`http://localhost:8086/api/v1/student/appointments/${appointmentId}`)
+            .then(response => {
+                setAppointments(appointments.filter(app => app.appointment_id !== appointmentId));
+                alert('Appointment deleted successfully');
+            })
+            .catch(error => {
+                alert('Failed to delete appointment: ' + (error.response?.data?.message || error.message));
+            });
+    };
+
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'Confirmed':
+            case 'APPROVED':
                 return 'bg-gradient-to-r from-[#2CC295]/10 to-[#2CC295]/20 text-[#2CC295] border-[#2CC295]/30';
-            case 'Pending':
+            case 'PENDING':
                 return 'bg-gradient-to-r from-amber-500/10 to-amber-600/10 text-amber-700 border-amber-200';
-            case 'Completed':
+            case 'REJECTED':
                 return 'bg-gradient-to-r from-blue-500/10 to-blue-600/10 text-blue-700 border-blue-200';
             default:
                 return 'bg-gradient-to-r from-[#696E79]/10 to-[#696E79]/20 text-[#696E79] border-[#696E79]/30';
@@ -103,11 +188,11 @@ const Appointments = () => {
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'Confirmed':
+            case 'APPROVED':
                 return <CheckCircle className="w-4 h-4" />;
-            case 'Pending':
+            case 'PENDING':
                 return <AlertCircle className="w-4 h-4" />;
-            case 'Completed':
+            case 'COMPLETED':
                 return <CheckCircle className="w-4 h-4" />;
             default:
                 return <Clock className="w-4 h-4" />;
@@ -115,9 +200,9 @@ const Appointments = () => {
     };
 
     const getAppointmentIcon = (status) => {
-        return status === 'Completed' ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 
-               status === 'Confirmed' ? 'bg-gradient-to-br from-[#2CC295] to-[#2CC295]/80' :
-               'bg-gradient-to-br from-amber-500 to-amber-600';
+        return status === 'COMPLETED' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
+            status === 'CONFIRMED' ? 'bg-gradient-to-br from-[#2CC295] to-[#2CC295]/80' :
+                'bg-gradient-to-br from-amber-500 to-amber-600';
     };
 
     return (
@@ -144,38 +229,44 @@ const Appointments = () => {
                 <div className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {/* Lecturer Search */}
-                        <div className="space-y-2 relative">
+                        <div className="relative max-w-md">
                             <label className="text-sm font-semibold text-[#132D46]">Select Lecturer</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#696E79]" />
                                 <input
                                     name="lecturer"
+                                    type="text"
                                     value={lecturerSearch}
                                     onChange={handleLecturerSearch}
-                                    onFocus={() => setShowLecturerDropdown(lecturerSearch.length > 0)}
-                                    required
-                                    placeholder="Search by name, department, or expertise..."
+                                    onFocus={() => setShowLecturerDropdown(lecturerSearch.trim().length > 0)}
+                                    placeholder="Search by first or last name..."
                                     className="w-full pl-10 pr-4 py-3 border-2 border-[#191E29]/20 rounded-xl text-[#132D46] font-medium focus:border-[#2CC295] focus:ring-4 focus:ring-[#2CC295]/20 transition-all duration-200"
                                     autoComplete="off"
+                                    spellCheck={false}
                                 />
                                 {showLecturerDropdown && filteredLecturers.length > 0 && (
                                     <div className="absolute z-20 bg-white border-2 border-[#2CC295]/20 w-full mt-2 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                                         {filteredLecturers.map(lecturer => (
                                             <div
-                                                key={lecturer.name}
+                                                key={`${lecturer.userDTO?.f_name}-${lecturer.userDTO?.l_name}`}
                                                 className="px-4 py-3 hover:bg-[#2CC295]/5 cursor-pointer border-b border-[#191E29]/10 last:border-b-0"
+                                                onMouseDown={e => e.preventDefault()} // Prevent input blur before click
                                                 onClick={() => handleLecturerSelect(lecturer)}
                                             >
-                                                <div className="font-semibold text-[#132D46]">{lecturer.name}</div>
-                                                <div className="text-sm text-[#696E79]">{lecturer.department} • {lecturer.expertise}</div>
+                                                <div className="font-semibold text-[#132D46]">{lecturer.userDTO?.f_name} {lecturer.userDTO?.l_name}</div>
                                             </div>
                                         ))}
+                                    </div>
+                                )}
+                                {showLecturerDropdown && filteredLecturers.length === 0 && (
+                                    <div className="absolute z-20 bg-white border-2 border-[#2CC295]/20 w-full mt-2 rounded-xl shadow-xl px-4 py-3 text-[#696E79]/80">
+                                        No lecturers found
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Duration */}
+                        {/* Duration 
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-[#132D46]">Duration</label>
                             <select
@@ -189,7 +280,7 @@ const Appointments = () => {
                                 <option value="45">45 minutes</option>
                                 <option value="60">1 hour</option>
                             </select>
-                        </div>
+                        </div>*/}
 
                         {/* Date */}
                         <div className="space-y-2">
@@ -222,8 +313,8 @@ const Appointments = () => {
                     <div className="space-y-2 mb-6">
                         <label className="text-sm font-semibold text-[#132D46]">Reason for Appointment</label>
                         <textarea
-                            name="reason"
-                            value={form.reason}
+                            name="purpose"
+                            value={form.purpose}
                             onChange={handleChange}
                             required
                             placeholder="Please describe the purpose of your appointment..."
@@ -232,13 +323,21 @@ const Appointments = () => {
                         />
                     </div>
 
-                    <button
-                        onClick={handleSubmit}
-                        className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
-                    >
-                        <Send className="w-5 h-5" />
-                        <span>Request Appointment</span>
-                    </button>
+                    <form onSubmit={isEditing ? handleUpdate : handleSubmit}>
+                        {/* all your inputs bound to form: lecturer, date, time, purpose */}
+                        <button type="submit">
+                            {isEditing ? 'Update Appointment' : 'Request Appointment'}
+                        </button>
+                        {isEditing && (
+                            <button type="button" onClick={() => {
+                                setIsEditing(false);
+                                setForm({ lecturerId: null, lecturer: '', date: '', time: '', purpose: '', status: 'PENDING' });
+                                setLecturerSearch('');
+                            }}>
+                                Cancel
+                            </button>
+                        )}
+                    </form>
                 </div>
             </div>
 
@@ -255,7 +354,7 @@ const Appointments = () => {
                 </div>
 
                 {appointments.map(appointment => (
-                    <div key={appointment.id} className="bg-white rounded-2xl shadow-lg border border-[#191E29]/10 overflow-hidden hover:shadow-xl transition-all duration-300">
+                    <div key={appointment.appointment_id} className="bg-white rounded-2xl shadow-lg border border-[#191E29]/10 overflow-hidden hover:shadow-xl transition-all duration-300">
                         {/* Appointment Header */}
                         <div className="bg-gradient-to-r from-[#F8FFFE] to-[#F0FFF4] px-6 py-4 border-b border-[#191E29]/10">
                             <div className="flex items-center justify-between">
@@ -264,7 +363,7 @@ const Appointments = () => {
                                         <User className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-[#132D46] text-lg">{appointment.lecturer}</h4>
+                                        <h4 className="font-bold text-[#132D46] text-lg">{appointment.lecturer_id}</h4>
                                         <div className="flex items-center space-x-4 text-[#696E79] font-medium">
                                             <span className="flex items-center space-x-1">
                                                 <Calendar className="w-4 h-4" />
@@ -291,23 +390,37 @@ const Appointments = () => {
                                     <MessageSquare className="w-4 h-4 text-[#2CC295]" />
                                     <span>Purpose:</span>
                                 </h5>
-                                <p className="text-[#132D46] font-medium">{appointment.reason}</p>
+                                <p className="text-[#132D46] font-medium">{appointment.purpose || appointment.reason}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-white rounded-xl p-4 border border-[#191E29]/10">
                                     <div className="flex items-center space-x-2 text-[#696E79] font-medium mb-1">
-                                        <MapPin className="w-4 h-4" />
-                                        <span>Location:</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleEditClick(appointment)}
+                                            className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-4 py-2 rounded font-semibold shadow"
+                                        >
+                                            Edit
+                                        </button>
                                     </div>
                                     <p className="text-[#132D46] font-semibold">{appointment.location}</p>
                                 </div>
                                 <div className="bg-white rounded-xl p-4 border border-[#191E29]/10">
                                     <div className="flex items-center space-x-2 text-[#696E79] font-medium mb-1">
-                                        <Clock className="w-4 h-4" />
-                                        <span>Duration:</span>
+                                        <button
+                                            className="bg-red-500 text-white px-4 py-2 rounded font-semibold shadow hover:bg-red-600 transition-colors duration-200"
+                                            disabled={appointment.status === 'APPROVED' || appointment.status === 'REJECTED'}
+                                            type="button"
+                                            onClick={() => {
+                                                if (window.confirm("Are you sure you want to delete this appointment?")) {
+                                                    handleDelete(appointment.appointment_id);
+                                                }
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
-                                    <p className="text-[#132D46] font-semibold">{appointment.duration}</p>
                                 </div>
                             </div>
                         </div>
@@ -329,3 +442,5 @@ const Appointments = () => {
 };
 
 export default Appointments;
+
+
