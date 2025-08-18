@@ -34,14 +34,16 @@ const Login = () => {
       const decoded = JSON.parse(atob(token.split('.')[1])); // simple base64 decode without external library
       const userRole = decoded.role.toLowerCase().trim();
       const userId = decoded.userId;
+      const lecturerId = decoded.lecturerId || null; // handle lecturerId if exists
+      const studentId = decoded.studentId || null; // handle studentId if exists
 
       // Navigate based on user role
       if (userRole === 'admin') {
         navigate(`/admin/${userId}`);
       } else if (userRole === 'lecturer') {
-        navigate(`/lecturer/${userId}/home`);
+        navigate(`/lecturer/${lecturerId}/home`);
       } else if (userRole === 'student') {
-        navigate(`/student/${userId}/dashboard`);
+        navigate(`/student/${studentId}/dashboard`);
       } else {
         navigate('/unauthorized');
       }
