@@ -1,165 +1,476 @@
-import React, { useState } from 'react';
-import { MessageCircle, Clock, Paperclip, ThumbsUp, CheckCircle, User, Search, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageCircle, Clock, Paperclip, ThumbsUp, CheckCircle, User, Search, Filter, Plus, X } from 'lucide-react';
+import axios from 'axios';
 
+const API_BASE_URL = 'http://localhost:8086/api/v1/peer-learning';
+
+// Temporary mock data until backend endpoints are implemented
 const mockQuestions = [
   {
     id: 1,
-    question: 'How to solve question 3 in assignment 2?',
-    priority: 'Urgent',
-    category: 'Assignment Help',
-    author: 'John Doe',
-    timestamp: '2 hours ago',
-    attachments: [],
+    questionText: "How do you implement a binary search tree in Java?",
+    priority: "High",
+    category: "Concepts",
+    studentId: 2,
+    studentName: "Alice Johnson",
+    courseId: 1,
+    courseName: "Data Structures",
+    createdAt: "2024-01-15T10:30:00Z",
     upvotes: 5,
     isResolved: false,
     answers: [
       {
         id: 1,
-        answer: 'To solve question 3, first refer to lecture notes from week 4. The key concept is understanding the recursive algorithm. Start by identifying the base case, then work through the recursive calls step by step.',
-        author: 'Jane Smith',
-        timestamp: '1 hour ago',
+        answerText: "A binary search tree is implemented using a Node class with left and right pointers. Here's a basic structure...",
+        studentId: 3,
+        studentName: "Bob Smith",
+        createdAt: "2024-01-15T11:00:00Z",
         upvotes: 3,
-        isAccepted: false,
-        attachments: []
+        isAccepted: false
       }
     ]
   },
   {
     id: 2,
-    question: 'Can someone explain the difference between BFS and DFS algorithms?',
-    priority: 'Normal',
-    category: 'Concepts',
-    author: 'Alice Johnson',
-    timestamp: '5 hours ago',
-    attachments: [],
+    questionText: "What's the difference between ArrayList and LinkedList in Java?",
+    priority: "Normal",
+    category: "Concepts",
+    studentId: 4,
+    studentName: "Carol Davis",
+    courseId: 1,
+    courseName: "Data Structures",
+    createdAt: "2024-01-14T14:20:00Z",
     upvotes: 8,
     isResolved: true,
     answers: [
       {
-        id: 1,
-        answer: 'BFS (Breadth-First Search) explores nodes level by level, using a queue. DFS (Depth-First Search) explores as far as possible along each branch before backtracking, using a stack or recursion.',
-        author: 'Bob Wilson',
-        timestamp: '4 hours ago',
-        upvotes: 6,
-        isAccepted: true,
-        attachments: []
+        id: 2,
+        answerText: "ArrayList uses a dynamic array internally, providing O(1) access time but O(n) insertion/deletion. LinkedList uses doubly-linked nodes, providing O(1) insertion/deletion but O(n) access time.",
+        studentId: 5,
+        studentName: "David Wilson",
+        createdAt: "2024-01-14T15:00:00Z",
+        upvotes: 12,
+        isAccepted: true
       }
     ]
+  },
+  {
+    id: 3,
+    questionText: "Need help with React useEffect dependencies array",
+    priority: "High",
+    category: "Assignment Help",
+    studentId: 6,
+    studentName: "Eva Brown",
+    courseId: 2,
+    courseName: "Web Development",
+    createdAt: "2024-01-16T09:15:00Z",
+    upvotes: 2,
+    isResolved: false,
+    answers: []
   }
 ];
 
 const categories = ['All', 'Assignment Help', 'Concepts', 'Exam Prep', 'Projects', 'Other'];
 
-const PeerLearning = () => {
-  const [questions, setQuestions] = useState(mockQuestions);
-  const [newQ, setNewQ] = useState({ question: '', priority: 'Normal', category: 'Other', attachments: [] });
+const PeerLearning = ({ currentUserId = 1, currentCourseId = null }) => {
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newQ, setNewQ] = useState({
+    questionText: '',
+    priority: 'Normal',
+    category: 'Other',
+    courseId: currentCourseId
+  });
   const [answer, setAnswer] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('recent');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Load questions on component mount and when filters change
+  useEffect(() => {
+    loadQuestions();
+  }, [selectedCategory, sortBy, searchTerm, currentCourseId]);
+
+  const loadQuestions = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // Try real API first, fallback to mock data if backend endpoints don't exist
+      try {
+        const params = {
+          category: selectedCategory !== 'All' ? selectedCategory : undefined,
+          sortBy,
+          searchTerm: searchTerm.trim() || undefined
+        };
+
+        let response;
+        if (currentCourseId) {
+          response = await axios.get(`${API_BASE_URL}/questions/course/${currentCourseId}`, { params });
+        } else {
+          response = await axios.get(`${API_BASE_URL}/questions`, { params });
+        }
+
+        setQuestions(response.data || []);
+
+      } catch (apiError) {
+        // If API fails (404), use mock data as fallback
+        console.warn('Backend endpoints not implemented yet, using mock data:', apiError.message);
+
+        let filteredQuestions = [...mockQuestions];
+
+        // Apply category filter
+        if (selectedCategory !== 'All') {
+          filteredQuestions = filteredQuestions.filter(q => q.category === selectedCategory);
+        }
+
+        // Apply course filter
+        if (currentCourseId) {
+          filteredQuestions = filteredQuestions.filter(q => q.courseId === currentCourseId);
+        }
+
+        // Apply search filter
+        if (searchTerm.trim()) {
+          const search = searchTerm.toLowerCase();
+          filteredQuestions = filteredQuestions.filter(q =>
+            q.questionText.toLowerCase().includes(search) ||
+            q.studentName.toLowerCase().includes(search) ||
+            q.courseName.toLowerCase().includes(search)
+          );
+        }
+
+        // Apply sorting
+        if (sortBy === 'recent') {
+          filteredQuestions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        } else if (sortBy === 'popular') {
+          filteredQuestions.sort((a, b) => b.upvotes - a.upvotes);
+        } else if (sortBy === 'priority') {
+          const priorityOrder = { 'High': 3, 'Normal': 2, 'Low': 1 };
+          filteredQuestions.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+        }
+
+        setQuestions(filteredQuestions);
+      }
+    } catch (err) {
+      console.error('Error loading questions:', err);
+      setError('Failed to load questions. Please try again.');
+      setQuestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleQChange = (e) => {
     setNewQ({ ...newQ, [e.target.name]: e.target.value });
   };
 
-  const handleQSubmit = () => {
-    if (!newQ.question) return;
-    const newQuestion = {
-      id: questions.length + 1,
-      ...newQ,
-      author: 'Current User',
-      timestamp: 'Just now',
-      upvotes: 0,
-      isResolved: false,
-      answers: []
-    };
-    setQuestions([newQuestion, ...questions]);
-    setNewQ({ question: '', priority: 'Normal', category: 'Other', attachments: [] });
+  const handleQSubmit = async () => {
+    if (!newQ.questionText.trim()) {
+      setError('Please enter a question');
+      return;
+    }
+
+    try {
+      setError('');
+
+      // Try real API first, fallback to mock data if backend endpoints don't exist
+      try {
+        const questionData = {
+          ...newQ,
+          studentId: currentUserId,
+          courseId: currentCourseId || newQ.courseId
+        };
+
+        await axios.post(`${API_BASE_URL}/questions`, questionData);
+
+      } catch (apiError) {
+        // If API fails (404), use mock data as fallback
+        console.warn('Backend endpoint not implemented yet, using mock data:', apiError.message);
+
+        const newQuestion = {
+          id: mockQuestions.length + 1,
+          questionText: newQ.questionText,
+          priority: newQ.priority,
+          category: newQ.category,
+          studentId: currentUserId,
+          studentName: "You", // In real implementation, get from user context
+          courseId: currentCourseId || newQ.courseId,
+          courseName: "Current Course", // In real implementation, get from course data
+          createdAt: new Date().toISOString(),
+          upvotes: 0,
+          isResolved: false,
+          answers: []
+        };
+
+        mockQuestions.unshift(newQuestion); // Add to beginning of array
+      }
+
+      setSuccessMessage('Question posted successfully!');
+      setNewQ({
+        questionText: '',
+        priority: 'Normal',
+        category: 'Other',
+        courseId: currentCourseId
+      });
+
+      // Reload questions
+      loadQuestions();
+
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error creating question:', err);
+      setError('Failed to post question. Please try again.');
+    }
   };
 
   const handleAnswerChange = (id, value) => {
     setAnswer({ ...answer, [id]: value });
   };
 
-  const handleAnswerSubmit = (qid) => {
-    if (!answer[qid]) return;
+  const handleAnswerSubmit = async (questionId) => {
+    if (!answer[questionId]?.trim()) {
+      return;
+    }
 
-    const newAnswer = {
-      id: Date.now(),
-      answer: answer[qid],
-      author: 'Current User',
-      timestamp: 'Just now',
-      upvotes: 0,
-      isAccepted: false,
-      attachments: []
-    };
+    try {
+      setError('');
 
-    setQuestions(
-      questions.map(q =>
-        q.id === qid
-          ? { ...q, answers: [...q.answers, newAnswer] }
-          : q
-      )
-    );
-    setAnswer({ ...answer, [qid]: '' });
+      // Try real API first, fallback to mock data if backend endpoints don't exist
+      try {
+        const answerData = {
+          questionId,
+          studentId: currentUserId,
+          answerText: answer[questionId]
+        };
+
+        await axios.post(`${API_BASE_URL}/answers`, answerData);
+
+      } catch (apiError) {
+        // If API fails (404), use mock data as fallback
+        console.warn('Backend endpoint not implemented yet, using mock data:', apiError.message);
+
+        const questionIndex = mockQuestions.findIndex(q => q.id === questionId);
+        if (questionIndex !== -1) {
+          const newAnswer = {
+            id: Date.now(), // Simple ID generation for mock
+            answerText: answer[questionId],
+            studentId: currentUserId,
+            studentName: "You", // In real implementation, get from user context
+            createdAt: new Date().toISOString(),
+            upvotes: 0,
+            isAccepted: false
+          };
+
+          mockQuestions[questionIndex].answers.push(newAnswer);
+        }
+      }
+
+      setAnswer({ ...answer, [questionId]: '' });
+      setSuccessMessage('Answer posted successfully!');
+
+      // Reload questions to show the new answer
+      loadQuestions();
+
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error creating answer:', err);
+      setError('Failed to post answer. Please try again.');
+    }
   };
 
-  const handleUpvote = (qid, aid = null) => {
-    setQuestions(
-      questions.map(q => {
-        if (q.id === qid) {
-          if (aid === null) {
-            return { ...q, upvotes: q.upvotes + 1 };
-          } else {
-            return {
-              ...q,
-              answers: q.answers.map(a =>
-                a.id === aid ? { ...a, upvotes: a.upvotes + 1 } : a
-              )
-            };
+  const handleUpvote = async (questionId, answerId = null) => {
+    try {
+      setError('');
+
+      // Try real API first, fallback to mock data if backend endpoints don't exist
+      try {
+        const upvoteData = {
+          studentId: currentUserId,
+          questionId: answerId ? null : questionId,
+          answerId: answerId
+        };
+
+        const endpoint = answerId ? '/answers/upvote' : '/questions/upvote';
+        await axios.post(`${API_BASE_URL}${endpoint}`, upvoteData);
+
+      } catch (apiError) {
+        // If API fails (404), use mock data as fallback
+        console.warn('Backend endpoint not implemented yet, using mock data:', apiError.message);
+
+        if (answerId) {
+          // Upvote an answer
+          const questionIndex = mockQuestions.findIndex(q => q.id === questionId);
+          if (questionIndex !== -1) {
+            const answerIndex = mockQuestions[questionIndex].answers.findIndex(a => a.id === answerId);
+            if (answerIndex !== -1) {
+              mockQuestions[questionIndex].answers[answerIndex].upvotes += 1;
+            }
+          }
+        } else {
+          // Upvote a question
+          const questionIndex = mockQuestions.findIndex(q => q.id === questionId);
+          if (questionIndex !== -1) {
+            mockQuestions[questionIndex].upvotes += 1;
           }
         }
-        return q;
-      })
-    );
+      }
+
+      // Reload questions to show updated upvote counts
+      loadQuestions();
+    } catch (err) {
+      console.error('Error toggling upvote:', err);
+      setError('Failed to update upvote. Please try again.');
+    }
   };
 
-  const handleAcceptAnswer = (qid, aid) => {
-    setQuestions(
-      questions.map(q => {
-        if (q.id === qid) {
-          return {
-            ...q,
-            isResolved: true,
-            answers: q.answers.map(a =>
-              a.id === aid ? { ...a, isAccepted: true } : { ...a, isAccepted: false }
-            )
-          };
+  const handleAcceptAnswer = async (answerId, questionId) => {
+    try {
+      setError('');
+
+      // Try real API first, fallback to mock data if backend endpoints don't exist
+      try {
+        await axios.put(`${API_BASE_URL}/answers/${answerId}/accept`, null, {
+          params: { questionId, studentId: currentUserId }
+        });
+
+      } catch (apiError) {
+        // If API fails (404), use mock data as fallback
+        console.warn('Backend endpoint not implemented yet, using mock data:', apiError.message);
+
+        const questionIndex = mockQuestions.findIndex(q => q.id === questionId);
+        if (questionIndex !== -1) {
+          const question = mockQuestions[questionIndex];
+
+          // Check if user owns the question
+          if (question.studentId !== currentUserId) {
+            setError('You can only accept answers to your own questions.');
+            return;
+          }
+
+          // Mark all answers as not accepted first
+          question.answers.forEach(answer => {
+            answer.isAccepted = false;
+          });
+
+          // Mark the selected answer as accepted
+          const answerIndex = question.answers.findIndex(a => a.id === answerId);
+          if (answerIndex !== -1) {
+            question.answers[answerIndex].isAccepted = true;
+            question.isResolved = true;
+          }
         }
-        return q;
-      })
-    );
+      }
+
+      setSuccessMessage('Answer accepted successfully!');
+
+      // Reload questions to show the accepted answer
+      loadQuestions();
+
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error accepting answer:', err);
+      if (err.response?.status === 403) {
+        setError('You can only accept answers to your own questions.');
+      } else {
+        setError('Failed to accept answer. Please try again.');
+      }
+    }
   };
 
-  // Filter and sort questions
-  const filteredQuestions = questions
-    .filter(q => {
-      const matchesSearch = q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.answers.some(a => a.answer.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesCategory = selectedCategory === 'All' || q.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'recent') return b.id - a.id;
-      if (sortBy === 'popular') return b.upvotes - a.upvotes;
-      if (sortBy === 'unanswered') return a.answers.length - b.answers.length;
-      return 0;
-    });
+  const handleDeleteQuestion = async (questionId) => {
+    if (!window.confirm('Are you sure you want to delete this question?')) {
+      return;
+    }
+
+    try {
+      setError('');
+
+      // Try real API first, fallback to mock data if backend endpoints don't exist
+      try {
+        await axios.delete(`${API_BASE_URL}/questions/${questionId}`, {
+          params: { studentId: currentUserId }
+        });
+
+      } catch (apiError) {
+        // If API fails (404), use mock data as fallback
+        console.warn('Backend endpoint not implemented yet, using mock data:', apiError.message);
+
+        const questionIndex = mockQuestions.findIndex(q => q.id === questionId);
+        if (questionIndex !== -1) {
+          const question = mockQuestions[questionIndex];
+
+          // Check if user owns the question
+          if (question.studentId !== currentUserId) {
+            setError('You can only delete your own questions.');
+            return;
+          }
+
+          // Remove the question from mock data
+          mockQuestions.splice(questionIndex, 1);
+        }
+      }
+
+      setSuccessMessage('Question deleted successfully!');
+
+      // Reload questions
+      loadQuestions();
+
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error deleting question:', err);
+      if (err.response?.status === 403) {
+        setError('You can only delete your own questions.');
+      } else {
+        setError('Failed to delete question. Please try again.');
+      }
+    }
+  };
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return 'Unknown time';
+
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return 'Just now';
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Peer Learning Hub</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          Peer Learning Hub
+          {currentCourseId && <span className="text-lg font-normal text-gray-600 ml-2">(Course Specific)</span>}
+        </h2>
+
+        {/* Error and Success Messages */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center justify-between">
+            <span>{error}</span>
+            <button onClick={() => setError('')} className="text-red-500 hover:text-red-700">
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center justify-between">
+            <span>{successMessage}</span>
+            <button onClick={() => setSuccessMessage('')} className="text-green-500 hover:text-green-700">
+              <X size={16} />
+            </button>
+          </div>
+        )}
 
         {/* Search and Filters */}
         <div className="flex flex-wrap gap-3 mb-4">
@@ -193,14 +504,22 @@ const PeerLearning = () => {
             <option value="popular">Most Popular</option>
             <option value="unanswered">Unanswered First</option>
           </select>
+
+          <button
+            onClick={loadQuestions}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <Search size={16} />
+            Refresh
+          </button>
         </div>
 
         {/* Ask Question Form */}
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="space-y-3">
             <textarea
-              name="question"
-              value={newQ.question}
+              name="questionText"
+              value={newQ.questionText}
               onChange={handleQChange}
               placeholder="What's your question? Be specific and include relevant details..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500"
@@ -239,9 +558,10 @@ const PeerLearning = () => {
 
               <button
                 onClick={handleQSubmit}
-                disabled={!newQ.question}
-                className="ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!newQ.questionText.trim()}
+                className="ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
+                <Plus size={16} />
                 Post Question
               </button>
             </div>
@@ -251,12 +571,17 @@ const PeerLearning = () => {
 
       {/* Questions List */}
       <div className="space-y-4">
-        {filteredQuestions.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8 text-gray-500">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            Loading questions...
+          </div>
+        ) : questions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             No questions found. Be the first to ask!
           </div>
         ) : (
-          filteredQuestions.map(q => (
+          questions.map(q => (
             <div key={q.id} className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
               <div className="p-4">
                 {/* Question Header */}
@@ -280,57 +605,68 @@ const PeerLearning = () => {
                       </span>
                     </div>
 
-                    <h3 className="font-semibold text-gray-800 text-lg mb-2">{q.question}</h3>
+                    <h3 className="font-semibold text-gray-800 text-lg mb-2">{q.questionText}</h3>
 
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1">
                         <User size={14} />
-                        {q.author}
+                        {q.studentName || 'Anonymous'}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock size={14} />
-                        {q.timestamp}
+                        {formatTimestamp(q.createdAt)}
                       </span>
                       <span className="flex items-center gap-1">
                         <MessageCircle size={14} />
-                        {q.answers.length} answers
+                        {q.answers?.length || 0} answers
                       </span>
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleUpvote(q.id)}
-                    className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
-                  >
-                    <ThumbsUp size={20} />
-                    <span className="text-sm font-medium">{q.upvotes}</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleUpvote(q.id)}
+                      className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                    >
+                      <ThumbsUp size={20} />
+                      <span className="text-sm font-medium">{q.upvotes || 0}</span>
+                    </button>
+
+                    {q.studentId === currentUserId && (
+                      <button
+                        onClick={() => handleDeleteQuestion(q.id)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Answers */}
-                {q.answers.length > 0 && (
+                {q.answers && q.answers.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
                     {q.answers.map(a => (
                       <div key={a.id} className={`pl-4 border-l-2 ${a.isAccepted ? 'border-green-500' : 'border-gray-200'
                         }`}>
-                        <p className="text-gray-700 mb-2">{a.answer}</p>
+                        <p className="text-gray-700 mb-2">{a.answerText}</p>
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                               <User size={14} />
-                              {a.author}
+                              {a.studentName || 'Anonymous'}
                             </span>
-                            <span>{a.timestamp}</span>
+                            <span>{formatTimestamp(a.createdAt)}</span>
                             {a.isAccepted && (
                               <span className="text-green-600 font-medium">✓ Accepted Answer</span>
                             )}
                           </div>
 
                           <div className="flex items-center gap-2">
-                            {!q.isResolved && (
+                            {!q.isResolved && q.studentId === currentUserId && !a.isAccepted && (
                               <button
-                                onClick={() => handleAcceptAnswer(q.id, a.id)}
+                                onClick={() => handleAcceptAnswer(a.id, q.id)}
                                 className="text-sm text-green-600 hover:text-green-700"
                               >
                                 Accept
@@ -341,7 +677,7 @@ const PeerLearning = () => {
                               className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
                             >
                               <ThumbsUp size={16} />
-                              <span className="text-sm">{a.upvotes}</span>
+                              <span className="text-sm">{a.upvotes || 0}</span>
                             </button>
                           </div>
                         </div>
@@ -358,11 +694,18 @@ const PeerLearning = () => {
                       onChange={e => handleAnswerChange(q.id, e.target.value)}
                       placeholder="Share your answer..."
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAnswerSubmit(q.id);
+                        }
+                      }}
                     />
                     <button
                       type="button"
                       onClick={() => handleAnswerSubmit(q.id)}
-                      className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      disabled={!answer[q.id]?.trim()}
+                      className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Answer
                     </button>

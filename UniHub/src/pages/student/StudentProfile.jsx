@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Edit3, Save, X, CreditCard, BookOpen, GraduationCap, MapPin, Calendar, Award, Star, HourglassIcon, HouseWifi, HomeIcon, Youtube } from 'lucide-react';
+import { User, Mail, Phone, Edit3, Save, X, CreditCard, BookOpen } from 'lucide-react';
 
 const mockProfile = {
     name: 'Nimantha Madushan',
@@ -8,18 +8,8 @@ const mockProfile = {
     major: 'Computer Science',
     year: '3',
     phone: '077 1415855',
-    bio: 'Passionate computer science student with a keen interest in artificial intelligence and machine learning. I enjoy solving complex problems and contributing to open-source projects. Currently working on my final year project involving natural language processing.',
-    gpa: '3.85',
-    completedCredits: '98',
-    expectedGraduation: 'May 2025',
-    location: 'Rajagiriya, Sri Lanka'
+    bio: 'Passionate computer science student with a keen interest in artificial intelligence and machine learning. I enjoy solving complex problems and contributing to open-source projects. Currently working on my final year project involving natural language processing.'
 };
-
-const achievements = [
-    { title: 'Dean\'s List', description: 'Fall 2023', icon: Award },
-    { title: 'Hackathon Winner', description: 'TechCrunch Disrupt 2023', icon: Star },
-    { title: 'Research Assistant', description: 'AI Lab - Spring 2024', icon: BookOpen }
-];
 
 const StudentProfile = () => {
     const [profile, setProfile] = useState(mockProfile);
@@ -49,42 +39,44 @@ const StudentProfile = () => {
     return (
         <div className="space-y-8 max-w-5xl mx-auto px-4">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center space-x-4">
                     <div className="bg-gradient-to-br from-[#2CC295] to-[#2CC295]/80 p-3 rounded-xl shadow-lg">
                         <User className="w-6 h-6 text-white" />
                     </div>
                     <div>
                         <h2 className="text-2xl font-bold text-[#132D46] tracking-tight">Student Profile</h2>
-                        <p className="text-[#696E79] font-medium">Manage your personal information and academic details</p>
+                        <p className="text-[#696E79] font-medium">Manage your personal information</p>
                     </div>
                 </div>
-                {!isEditing ? (
-                    <button
-                        onClick={handleEdit}
-                        className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
-                    >
-                        <Edit3 className="w-5 h-5" />
-                        <span>Edit Profile</span>
-                    </button>
-                ) : (
-                    <div className="flex space-x-3">
+                <div className="flex justify-end">
+                    {!isEditing ? (
                         <button
-                            onClick={handleSave}
+                            onClick={handleEdit}
                             className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
                         >
-                            <Save className="w-5 h-5" />
-                            <span>Save</span>
+                            <Edit3 className="w-5 h-5" />
+                            <span>Edit Profile</span>
                         </button>
-                        <button
-                            onClick={handleCancel}
-                            className="bg-white text-[#132D46] px-6 py-3 rounded-xl font-semibold border-2 border-[#191E29]/20 hover:bg-[#F8FFFE] hover:border-[#2CC295]/30 transition-all duration-200 flex items-center space-x-2"
-                        >
-                            <X className="w-5 h-5" />
-                            <span>Cancel</span>
-                        </button>
-                    </div>
-                )}
+                    ) : (
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={handleSave}
+                                className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                            >
+                                <Save className="w-5 h-5" />
+                                <span>Save</span>
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="bg-white text-[#132D46] px-6 py-3 rounded-xl font-semibold border-2 border-[#191E29]/20 hover:bg-[#F8FFFE] hover:border-[#2CC295]/30 transition-all duration-200 flex items-center space-x-2"
+                            >
+                                <X className="w-5 h-5" />
+                                <span>Cancel</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -231,73 +223,6 @@ const StudentProfile = () => {
                             ) : (
                                 <p className="text-[#132D46] font-medium leading-relaxed">{profile.bio}</p>
                             )}
-                        </div>
-                    </div>
-
-                    {/* Academic Information */}
-                    <div className="bg-white rounded-2xl shadow-lg border border-[#191E29]/10 overflow-hidden">
-                        <div className="bg-gradient-to-r from-[#F8FFFE] to-[#F0FFF4] px-6 py-4 border-b border-[#191E29]/10">
-                            <h4 className="text-lg font-bold text-[#132D46] flex items-center space-x-2">
-                                <GraduationCap className="w-5 h-5 text-[#2CC295]" />
-                                <span>Academic Information</span>
-                            </h4>
-                        </div>
-                        <div className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-gradient-to-br from-[#F8FFFE] to-[#F0FFF4] rounded-xl p-4 border border-[#2CC295]/20">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <Award className="w-5 h-5 text-[#2CC295]" />
-                                        <span className="text-[#132D46] font-semibold">Current GPA</span>
-                                    </div>
-                                    <p className="text-2xl font-bold text-[#2CC295]">{profile.gpa}</p>
-                                </div>
-                                <div className="bg-gradient-to-br from-[#F8FFFE] to-[#F0FFF4] rounded-xl p-4 border border-[#2CC295]/20">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <BookOpen className="w-5 h-5 text-[#2CC295]" />
-                                        <span className="text-[#132D46] font-semibold">Credits Completed</span>
-                                    </div>
-                                    <p className="text-2xl font-bold text-[#2CC295]">{profile.completedCredits}</p>
-                                </div>
-                                <div className="bg-gradient-to-br from-[#F8FFFE] to-[#F0FFF4] rounded-xl p-4 border border-[#2CC295]/20">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <Calendar className="w-5 h-5 text-[#2CC295]" />
-                                        <span className="text-[#132D46] font-semibold">Expected Graduation</span>
-                                    </div>
-                                    <p className="text-lg font-bold text-[#132D46]">{profile.expectedGraduation}</p>
-                                </div>
-                                <div className="bg-gradient-to-br from-[#F8FFFE] to-[#F0FFF4] rounded-xl p-4 border border-[#2CC295]/20">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <MapPin className="w-5 h-5 text-[#2CC295]" />
-                                        <span className="text-[#132D46] font-semibold">Location</span>
-                                    </div>
-                                    <p className="text-lg font-bold text-[#132D46]">{profile.location}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Achievements */}
-                    <div className="bg-white rounded-2xl shadow-lg border border-[#191E29]/10 overflow-hidden">
-                        <div className="bg-gradient-to-r from-[#F8FFFE] to-[#F0FFF4] px-6 py-4 border-b border-[#191E29]/10">
-                            <h4 className="text-lg font-bold text-[#132D46] flex items-center space-x-2">
-                                <Star className="w-5 h-5 text-[#2CC295]" />
-                                <span>Achievements & Recognition</span>
-                            </h4>
-                        </div>
-                        <div className="p-6">
-                            <div className="grid grid-cols-1 gap-4">
-                                {achievements.map((achievement, index) => (
-                                    <div key={index} className="flex items-center space-x-4 p-4 bg-gradient-to-r from-[#F8FFFE] to-[#F0FFF4] rounded-xl border border-[#2CC295]/20">
-                                        <div className="bg-[#2CC295] p-3 rounded-xl shadow-lg">
-                                            <achievement.icon className="w-5 h-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <h5 className="font-bold text-[#132D46]">{achievement.title}</h5>
-                                            <p className="text-[#696E79] font-medium">{achievement.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 </div>
