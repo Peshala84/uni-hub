@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { BookOpen, Plus, MessageSquare, Star, FileText, BookMarked, Users, HelpCircle } from 'lucide-react';
 import Queries from '../../components/users/Queries';
 import { useAuth } from '../../contexts/AuthContexts';
 import axios from 'axios';
 
+
 const Courses = () => {
   const [activeTab, setActiveTab] = useState('announcements');
   const [showForm, setShowForm] = useState(false);
   const { userData } = useAuth();
+  const { lecturerId } = useParams();
 
 
   // Feedback state
@@ -95,9 +98,6 @@ const Courses = () => {
     setFeedbackError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching feedback for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/feedback`);
@@ -122,13 +122,11 @@ const Courses = () => {
 
   // Function to fetch announcements data
   const fetchAnnouncements = async () => {
+   
     setIsLoadingAnnouncements(true);
     setAnnouncementError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching announcements for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/announcements`);
@@ -138,6 +136,8 @@ const Courses = () => {
 
     } catch (error) {
       console.error('Error fetching announcements:', error);
+      console.log('Fetching announcements for lecturer ID:', lecturerId);
+
 
       if (error.response) {
         setAnnouncementError(error.response.data?.message || 'Failed to fetch announcements');
@@ -157,9 +157,6 @@ const Courses = () => {
     setAssignmentError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching assignments for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/assignments`);
@@ -188,9 +185,6 @@ const Courses = () => {
     setResourceError('');
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Fetching resources for lecturer ID:', lecturerId);
 
       const response = await axios.get(`http://localhost:8086/api/v1/lecturer/${lecturerId}/resources`);
@@ -222,10 +216,10 @@ const Courses = () => {
 
   // Fetch announcements when component mounts or when activeTab changes to announcements
   useEffect(() => {
-    if (activeTab === 'announcements') {
+    if (activeTab === 'announcements' && lecturerId) {
       fetchAnnouncements();
     }
-  }, [activeTab, userData]);
+  }, [activeTab, userData, lecturerId]);
 
 
   // Fetch assignments when component mounts or when activeTab changes to assignments
@@ -313,8 +307,6 @@ const Courses = () => {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", announcementForm.course_id);
       formData.append("content", announcementForm.content);
@@ -412,9 +404,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Deleting announcement:', announcementId);
 
       const response = await axios.delete(
@@ -491,12 +480,10 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      const lecturerId = userData?.id || 1;
-      
       // Create FormData to handle file upload
       const formData = new FormData();
       formData.append("content", editForm.content);
-      
+
       if (editForm.link) {
         formData.append("link", editForm.link);
       }
@@ -566,7 +553,7 @@ const Courses = () => {
       setIsSubmitting(false);
     }
   };
- 
+
   // Assignment editing functions
   const handleEditAssignment = (assignment) => {
     setEditingAssignment(assignment.assignment_id);
@@ -600,8 +587,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      const lecturerId = userData?.id || 1;
-      
       // Create FormData to handle file upload
       const formData = new FormData();
       formData.append("title", assignmentEditForm.title);
@@ -684,9 +669,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
-
       console.log('Deleting assignment:', assignmentId);
 
       const response = await axios.delete(
@@ -741,8 +723,6 @@ const Courses = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      const lecturerId = userData?.id || 1;
-
       console.log('Deleting resource:', resourceId);
 
       const response = await axios.delete(
@@ -818,7 +798,6 @@ const Courses = () => {
 
     try {
       const formData = new FormData();
-      const lecturerId = userData?.id || 1;
 
       formData.append("file_name", resourceEditForm.file_name);
 
@@ -909,8 +888,6 @@ const Courses = () => {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
 
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", assignmentForm.course_id);
@@ -1007,8 +984,6 @@ const Courses = () => {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      // Use userData.id with fallback to 1 for development/testing
-      const lecturerId = userData?.id || 1;
 
       formData.append("lecturerId", lecturerId);
       formData.append("courseId", resourceForm.course_id);
@@ -1314,7 +1289,7 @@ const Courses = () => {
                                 placeholder="Enter announcement content"
                               />
                             </div>
-                            
+
                             <div>
                               <label className="block mb-2 text-sm font-medium text-gray-700">
                                 Link (Optional)
@@ -1705,8 +1680,8 @@ const Courses = () => {
                         </span>
                         {editingAssignment !== assignment.assignment_id && (
                           <span className={`px-3 py-1 text-sm font-medium rounded-full ${new Date(assignment.date) < new Date()
-                              ? 'text-red-700 bg-red-100'
-                              : 'text-green-700 bg-green-100'
+                            ? 'text-red-700 bg-red-100'
+                            : 'text-green-700 bg-green-100'
                             }`}>
                             Due: {new Date(assignment.date).toLocaleDateString()}
                           </span>
@@ -1728,7 +1703,7 @@ const Courses = () => {
                               placeholder="Enter assignment title"
                             />
                           </div>
-                          
+
                           <div>
                             <label className="block mb-2 text-sm font-medium text-gray-700">
                               Description *

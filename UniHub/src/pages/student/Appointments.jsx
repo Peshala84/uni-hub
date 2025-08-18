@@ -2,32 +2,32 @@ import React, { useState } from 'react';
 import { Calendar, Clock, User, CheckCircle, AlertCircle, Search, Send, MapPin, MessageSquare } from 'lucide-react';
 
 const mockAppointments = [
-    { 
-        id: 1, 
-        lecturer: 'Dr. Smith', 
-        date: '2024-08-01', 
-        time: '10:00', 
-        reason: 'Discuss final project requirements and timeline', 
+    {
+        id: 1,
+        lecturer: 'Dr. Smith',
+        date: '2024-08-01',
+        time: '10:00',
+        reason: 'Discuss final project requirements and timeline',
         status: 'Confirmed',
         location: 'Room 203, Engineering Building',
         duration: '30 minutes'
     },
-    { 
-        id: 2, 
-        lecturer: 'Prof. Lee', 
-        date: '2024-08-03', 
-        time: '14:00', 
-        reason: 'Need help with assignment 3 - data structures', 
+    {
+        id: 2,
+        lecturer: 'Prof. Lee',
+        date: '2024-08-03',
+        time: '14:00',
+        reason: 'Need help with assignment 3 - data structures',
         status: 'Pending',
         location: 'Room 156, Computer Science Building',
         duration: '45 minutes'
     },
-    { 
-        id: 3, 
-        lecturer: 'Dr. Johnson', 
-        date: '2024-07-28', 
-        time: '09:30', 
-        reason: 'Career guidance and research opportunities', 
+    {
+        id: 3,
+        lecturer: 'Dr. Johnson',
+        date: '2024-07-28',
+        time: '09:30',
+        reason: 'Career guidance and research opportunities',
         status: 'Completed',
         location: 'Room 301, Faculty Office',
         duration: '60 minutes'
@@ -76,9 +76,9 @@ const Appointments = () => {
         e.preventDefault();
         setAppointments([
             ...appointments,
-            { 
-                id: appointments.length + 1, 
-                ...form, 
+            {
+                id: appointments.length + 1,
+                ...form,
                 status: 'Pending',
                 location: 'TBD',
                 duration: form.duration + ' minutes'
@@ -115,9 +115,9 @@ const Appointments = () => {
     };
 
     const getAppointmentIcon = (status) => {
-        return status === 'Completed' ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 
-               status === 'Confirmed' ? 'bg-gradient-to-br from-[#2CC295] to-[#2CC295]/80' :
-               'bg-gradient-to-br from-amber-500 to-amber-600';
+        return status === 'Completed' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
+            status === 'Confirmed' ? 'bg-gradient-to-br from-[#2CC295] to-[#2CC295]/80' :
+                'bg-gradient-to-br from-amber-500 to-amber-600';
     };
 
     return (

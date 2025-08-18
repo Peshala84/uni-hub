@@ -3,33 +3,33 @@ import React, { useState } from 'react';
 import { Download, FileText, File, User, Calendar, BookMarked, Search, Filter } from 'lucide-react';
 
 const mockResources = [
-  { 
-    id: 1, 
-    title: 'Lecture 1 Slides - Introduction to Computer Science', 
-    url: '#', 
-    type: 'PDF', 
+  {
+    id: 1,
+    title: 'Lecture 1 Slides - Introduction to Computer Science',
+    url: '#',
+    type: 'PDF',
     sharedBy: 'Dr. Smith',
     date: '2024-07-25',
     size: '2.4 MB',
     downloads: 125,
     description: 'Comprehensive introduction covering fundamental concepts and course overview.'
   },
-  { 
-    id: 2, 
-    title: 'Assignment 2 Instructions - Data Structures', 
-    url: '#', 
-    type: 'DOCX', 
+  {
+    id: 2,
+    title: 'Assignment 2 Instructions - Data Structures',
+    url: '#',
+    type: 'DOCX',
     sharedBy: 'Prof. Lee',
     date: '2024-07-20',
     size: '1.8 MB',
     downloads: 89,
     description: 'Detailed instructions for implementing binary trees and hash tables.'
   },
-  { 
-    id: 3, 
-    title: 'Lab Manual - Programming Exercises', 
-    url: '#', 
-    type: 'PDF', 
+  {
+    id: 3,
+    title: 'Lab Manual - Programming Exercises',
+    url: '#',
+    type: 'PDF',
     sharedBy: 'Dr. Johnson',
     date: '2024-07-18',
     size: '5.2 MB',
@@ -67,7 +67,7 @@ const Resources = () => {
 
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.sharedBy.toLowerCase().includes(searchTerm.toLowerCase());
+      resource.sharedBy.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterType === 'All' || resource.type === filterType;
     return matchesSearch && matchesFilter;
   });
@@ -152,7 +152,7 @@ const Resources = () => {
               {/* Resource Content */}
               <div className="p-6">
                 <p className="text-[#132D46] font-medium mb-4">{resource.description}</p>
-                
+
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center space-x-6 text-sm text-[#696E79] font-medium">
                     <div className="flex items-center space-x-1">
@@ -168,9 +168,9 @@ const Resources = () => {
                       <span>{resource.downloads} downloads</span>
                     </div>
                   </div>
-                  
-                  <a 
-                    href={resource.url} 
+
+                  <a
+                    href={resource.url}
                     download
                     className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
                   >

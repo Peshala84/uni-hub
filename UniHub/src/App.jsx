@@ -26,7 +26,7 @@ function App() {
 
 
            <Route
-              path="/student/:userId/*"
+              path="/student/:studentId/*"
               element={
                 <ProtectedRoute>
                   <Student /> {/* Your student component/routes */}
@@ -37,7 +37,7 @@ function App() {
 
 
             <Route
-              path="/lecturer/:userId/*"
+              path="/lecturer/:lecturerId/*"
               element={
                 <ProtectedRoute>
                   <Lecturer /> {/* Your student component/routes */}
