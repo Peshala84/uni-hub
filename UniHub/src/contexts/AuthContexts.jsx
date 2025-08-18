@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [studentId, setStudentId] = useState(null);
   const [lecturerId, setLecturerId] = useState(null);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     const token = sessionStorage.getItem("token"); // 👈 only read here
@@ -24,9 +25,10 @@ export const AuthProvider = ({ children }) => {
 
         setIsLoggedIn(true);
         setUserRole(decoded.role.toLowerCase());
-        setUserId(decoded.userId);
-        setStudentId(decoded.studentId || null);
-        setLecturerId(decoded.lecturerId || null);
+
+        setStudentId(decoded.studentId || null); // handle studentId if exists
+        setLecturerId(decoded.lecturerId || null); // handle lecturerId if exists
+
       } catch (err) {
         console.error('Invalid token:', err);
         sessionStorage.removeItem('token');
@@ -47,8 +49,10 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(true);
       setUserRole(decoded.role.toLowerCase());
       setUserId(decoded.userId);
-      setStudentId(decoded.studentId || null);
-      setLecturerId(decoded.lecturerId || null);
+
+      setStudentId(decoded.studentId || null); // handle studentId if exists
+      setLecturerId(decoded.lecturerId || null); // handle lecturerId if exists
+
     } catch (err) {
       console.error('Login failed: invalid token', err);
       setIsLoggedIn(false);
@@ -70,7 +74,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userRole, userId, studentId, lecturerId, login, logout, loading }}>
+
+    <AuthContext.Provider value={{ isLoggedIn, userRole, userId,studentId,lecturerId, login, logout, loading }}>
+
       {children}
     </AuthContext.Provider>
   );

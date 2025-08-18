@@ -19,7 +19,9 @@ import { useAuth } from '../../contexts/AuthContexts'; // adjust path as needed
 import unihubLogo from '../../assets/unihub_logo.jpeg';
 
 const Navbar = () => {
-  const { isLoggedIn, userRole, userId, studentId, lecturerId, logout } = useAuth();
+
+  const { isLoggedIn, userRole, userId,studentId,lecturerId, logout } = useAuth();
+
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -54,10 +56,14 @@ const Navbar = () => {
       return [
 
 
-        { path: `/student/${studentId}/home`, icon: Home, label: 'Home' },
+
+        { path: `/student/${studentId}/dashboard`, icon: Home, label: 'Dashboard' },
         { path: `/student/${studentId}/courses`, icon: BookMarked, label: 'My Courses' },
         { path: `/student/${studentId}/appointments`, icon: Calendar, label: 'Appointments' },
-        { path: `/student/${studentId}/peer-learning`, icon: Users, label: 'Peer Learning' },
+        { path: `/student/${studentId}peer-learning`, icon: Users, label: 'Peer Learning' },
+        { path: `/student/${studentId}/queries`, icon: MessageSquare, label: 'Queries' },
+        { path: `/student/${studentId}/announcements`, icon: Bell, label: 'Announcements' },
+
         { path: `/student/${studentId}/profile`, icon: User, label: 'Profile' },
 
 

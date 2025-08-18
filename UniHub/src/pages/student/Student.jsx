@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
 import Home from '../../pages/student/Home';
 import Login from '../../components/users/Login';
 import Courses from '../../pages/student/Courses';
@@ -10,7 +10,10 @@ import PeerLearning from '../../pages/student/PeerLearning';
 import FeedbackForum from '../../pages/student/FeedbackForum';
 import ProfilePage from '../../pages/student/StudentProfile';
 
+
 function Student() {
+
+    const {studentId} = useParams();
     return (
         <div className="min-h-screen bg-gray-50">
             <Routes>

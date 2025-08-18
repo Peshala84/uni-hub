@@ -13,6 +13,8 @@ import LecturerCourses from './pages/lecturer/Courses';
 import Notifications from './pages/lecturer/Notification';
 import ProfilePage from './pages/lecturer/Profile';
 import Student from './pages/student/Student';
+import ForgotPassword from './components/users/ForgotPassword';
+import ResetPassword from './components/users/ResetPassword';
 
 
 
@@ -33,11 +35,12 @@ function App() {
                 </ProtectedRoute>
               }
             />
+          
 
 
 
             <Route
-              path="/lecturer/:userId/*"
+              path="/lecturer/:studentId/*"
               element={
                 <ProtectedRoute>
                   <Lecturer /> {/* Your student component/routes */}
@@ -58,6 +61,8 @@ function App() {
 
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/courses" element={<LecturerCourses />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<ProfilePage />} />
