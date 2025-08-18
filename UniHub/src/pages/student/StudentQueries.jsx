@@ -55,37 +55,52 @@ const StudentQueries = ({ courseId, courseName, studentId }) => {
       const response = await axios.get(`http://localhost:8086/api/v1/student/${studentId}/queries?course_Id=${numericCourseId}`);
       console.log('Queries response:', response.data);
 
-      // Sort queries by creation date (most recent first)
+      // Sort queries by priority first, then by creation date
       const sortedQueries = (response.data || []).sort((a, b) => {
-        // Get the date strings
-        const dateStrA = a.createdAt || a.created_at || a.timestamp;
-        const dateStrB = b.createdAt || b.created_at || b.timestamp;
+        // Define priority order (High > Normal > Low)
+        const priorityOrder = { 'High': 3, 'Normal': 2, 'Low': 1 };
+        const priorityA = priorityOrder[a.priority] || 0;
+        const priorityB = priorityOrder[b.priority] || 0;
 
         console.log('Sorting query A:', {
           id: a.id || a.queryId,
-          date: dateStrA,
+          priority: a.priority,
+          priorityValue: priorityA,
           question: a.question?.substring(0, 30) + '...'
         });
         console.log('Sorting query B:', {
           id: b.id || b.queryId,
-          date: dateStrB,
+          priority: b.priority,
+          priorityValue: priorityB,
           question: b.question?.substring(0, 30) + '...'
         });
+
+        // First sort by priority (higher priority first)
+        if (priorityA !== priorityB) {
+          const priorityResult = priorityB - priorityA; // Descending order (High priority first)
+          console.log('Priority sort result:', priorityResult, priorityResult > 0 ? 'B has higher priority' : 'A has higher priority');
+          return priorityResult;
+        }
+
+        // If priorities are equal, sort by creation date (most recent first)
+        const dateStrA = a.createdAt || a.created_at || a.timestamp;
+        const dateStrB = b.createdAt || b.created_at || b.timestamp;
 
         // Parse dates, use a very old date for missing timestamps to put them at the bottom
         const dateA = dateStrA ? new Date(dateStrA) : new Date('1970-01-01');
         const dateB = dateStrB ? new Date(dateStrB) : new Date('1970-01-01');
 
-        console.log('Parsed dates - A:', dateA.toISOString(), 'B:', dateB.toISOString());
+        console.log('Same priority, sorting by date - A:', dateA.toISOString(), 'B:', dateB.toISOString());
 
-        const result = dateB.getTime() - dateA.getTime(); // Descending order (newest first)
-        console.log('Sort result:', result, result > 0 ? 'B is newer' : result < 0 ? 'A is newer' : 'same time');
+        const dateResult = dateB.getTime() - dateA.getTime(); // Descending order (newest first)
+        console.log('Date sort result:', dateResult, dateResult > 0 ? 'B is newer' : dateResult < 0 ? 'A is newer' : 'same time');
 
-        return result;
+        return dateResult;
       });
 
       console.log('Final sorted queries:', sortedQueries.map(q => ({
         id: q.id || q.queryId,
+        priority: q.priority,
         date: q.createdAt || q.created_at || q.timestamp,
         question: q.question?.substring(0, 50) + '...'
       })));
@@ -557,7 +572,7 @@ const StudentQueries = ({ courseId, courseName, studentId }) => {
             {queries.length > 0 && (
               <span className="text-sm text-[#696E79] flex items-center space-x-1">
                 <Clock className="w-4 h-4" />
-                <span>Sorted by newest first</span>
+                <span>Sorted by priority, then newest first</span>
               </span>
             )}
           </div>
@@ -761,15 +776,6 @@ const StudentQueries = ({ courseId, courseName, studentId }) => {
                             <span>Thank you for your feedback!</span>
                           </span>
                         )}
-                      </div>
-                    </div>
-                  )}
-
-                  {!q.response && q.status !== 'Resolved' && (
-                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                      <div className="flex items-center space-x-2 text-blue-700">
-                        <Clock className="w-4 h-4" />
-                        <span className="font-medium">Waiting for instructor response...</span>
                       </div>
                     </div>
                   )}
