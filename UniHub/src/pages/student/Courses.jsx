@@ -4,7 +4,7 @@ import { GraduationCap, BookOpen, HelpCircle, Star } from 'lucide-react';
 
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import StudentQueries from './StudentQueries';
 import Resources from './Resources';
 import FeedbackForum from './FeedbackForum';
@@ -20,13 +20,16 @@ const StudentCourses = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const { studentId } = useParams();
+    // const studentIdNum = parseInt(studentId, 10);
 
     useEffect(() => {
         const fetchCourses = async () => {
             setLoading(true);
             setError(null);
+            console.log('Fetching courses for studentId:', studentId);
             try {
-                const response = await axios.get('http://localhost:8086/api/v1/student/1/courses');
+                const response = await axios.get(`http://localhost:8086/api/v1/student/${studentId}/courses`);
                 console.log('Fetched courses response:', response);
                 // Adjust the response data path if needed
                 console.log('Courses array:', response.data);
@@ -39,16 +42,16 @@ const StudentCourses = () => {
             }
         };
         fetchCourses();
-    }, []);
+    }, [studentId]);
 
     const renderTabContent = () => {
         switch (activeTab) {
             case 'queries':
-                return <StudentQueries courseId={selectedCourse} />;
+                return <StudentQueries courseId={selectedCourse} studentId={studentId} />;
             case 'resources':
                 return <Resources courseId={selectedCourse} />;
             case 'feedback':
-                return <FeedbackForum courseId={selectedCourse} />;
+                return <FeedbackForum courseId={selectedCourse} studentId={studentId} />;
             default:
                 return null;
         }
