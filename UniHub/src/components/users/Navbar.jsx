@@ -35,14 +35,7 @@ const Navbar = () => {
   const getNavigationItems = () => {
     if (!isLoggedIn || !normalizedUserRole) return [];
 
-    if (normalizedUserRole === 'admin') {
-      return [
-        { path: `/admin/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
-        { path: `/admin/${userId}/users`, icon: Users, label: 'Manage Users' },
-        { path: `/admin/${userId}/notifications`, icon: Bell, label: 'Notifications' },
-        { path: `/admin/${userId}/profile`, icon: User, label: 'Profile' },
-      ];
-    }
+    
 
     if (normalizedUserRole === 'lecturer') {
       return [
@@ -61,12 +54,10 @@ const Navbar = () => {
       return [
 
 
-        { path: `/student/${userId}/dashboard`, icon: Home, label: 'Dashboard' },
+        { path: `/student/${userId}/home`, icon: Home, label: 'Home' },
         { path: `/student/${userId}/courses`, icon: BookMarked, label: 'My Courses' },
         { path: `/student/${userId}/appointments`, icon: Calendar, label: 'Appointments' },
         { path: `/student/${userId}peer-learning`, icon: Users, label: 'Peer Learning' },
-        { path: `/student/${userId}/queries`, icon: MessageSquare, label: 'Queries' },
-        { path: `/student/${userId}/announcements`, icon: Bell, label: 'Announcements' },
         { path: `/student/${userId}/profile`, icon: User, label: 'Profile' },
 
 
