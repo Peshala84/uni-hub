@@ -10,8 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [studentId, setStudentId] = useState(null);
   const [lecturerId, setLecturerId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [studentId, setStudentId] = useState(null);
-  const [lecturerId, setLecturerId] = useState(null);
+  
 
   useEffect(() => {
     const token = sessionStorage.getItem("token"); // 👈 only read here
