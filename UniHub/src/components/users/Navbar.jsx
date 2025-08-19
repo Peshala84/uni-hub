@@ -65,7 +65,7 @@ const Navbar = () => {
         { path: `/student/${studentId}/announcements`, icon: Bell, label: 'Announcements' },
 
         { path: `/student/${studentId}/profile`, icon: User, label: 'Profile' },
-
+{ path: `/student/${studentId}/notifications`, icon: Bell, label: 'Notifications' },
 
       ];
     }
@@ -77,7 +77,7 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-500 shadow-lg">
-      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div className="px-4 mx-auto max-w-9xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">

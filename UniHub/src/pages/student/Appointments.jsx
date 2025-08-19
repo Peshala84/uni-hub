@@ -65,6 +65,30 @@ const Appointments = () => {
         setShowLecturerDropdown(false);
     };
 
+    const isFutureDate = (selectedDate) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to midnight
+        const date = new Date(selectedDate);
+        return date > today;
+    };
+
+    const isTimeInRange = (time) => {
+        // time expected in HH:mm or HH:mm:ss
+        const [hour, minute] = time.split(':').map(Number);
+        if (hour < 9 || hour > 16) return false;
+        if (hour === 16 && minute > 0) return false;
+        return true;
+    };
+
+    const getLecturerName = (lecturerId) => {
+        const lecturer = lecturersList.find(l => l.lecturer_id === lecturerId);
+        if (lecturer) {
+            return `${lecturer.userDTO?.f_name} ${lecturer.userDTO?.l_name}`;
+        }
+        return 'Unknown Lecturer';
+    };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!form.lecturerId) {
@@ -75,8 +99,16 @@ const Appointments = () => {
             alert('Please select a date.');
             return;
         }
+        if (!isFutureDate(form.date)) {
+            alert('Date must be in the future.');
+            return;
+        }
         if (!form.time) {
             alert('Please select a time.');
+            return;
+        }
+        if (!isTimeInRange(form.time)) {
+            alert('Time must be between 9:00 AM and 4:00 PM.');
             return;
         }
         if (!form.purpose || form.purpose.trim() === '') {
@@ -325,11 +357,11 @@ const Appointments = () => {
 
                     <form onSubmit={isEditing ? handleUpdate : handleSubmit}>
                         {/* all your inputs bound to form: lecturer, date, time, purpose */}
-                        <button type="submit">
+                        <button type="submit" className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-4 py-2 rounded font-semibold shadow">
                             {isEditing ? 'Update Appointment' : 'Request Appointment'}
                         </button>
                         {isEditing && (
-                            <button type="button" onClick={() => {
+                            <button type="button" className="bg-gradient-to-r from-[#2CC295] to-[#2CC295]/90 text-white px-4 py-2 rounded font-semibold shadow" onClick={() => {
                                 setIsEditing(false);
                                 setForm({ lecturerId: null, lecturer: '', date: '', time: '', purpose: '', status: 'PENDING' });
                                 setLecturerSearch('');
@@ -388,10 +420,19 @@ const Appointments = () => {
                             <div className="bg-[#F8FFFE] rounded-xl p-4 border-l-4 border-[#2CC295]">
                                 <h5 className="font-semibold text-[#132D46] mb-2 flex items-center space-x-2">
                                     <MessageSquare className="w-4 h-4 text-[#2CC295]" />
+                                    <span>Meeting with</span>
+                                    <h4 className="font-bold text-[#132D46] text-lg">{getLecturerName(appointment.lecturer_id)}</h4>
+                                </h5>
+                                
+                            </div>
+                            <div className="bg-[#F8FFFE] rounded-xl p-4 border-l-4 border-[#2CC295]">
+                                <h5 className="font-semibold text-[#132D46] mb-2 flex items-center space-x-2">
+                                    <MessageSquare className="w-4 h-4 text-[#2CC295]" />
                                     <span>Purpose:</span>
                                 </h5>
                                 <p className="text-[#132D46] font-medium">{appointment.purpose || appointment.reason}</p>
                             </div>
+
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-white rounded-xl p-4 border border-[#191E29]/10">
@@ -406,6 +447,7 @@ const Appointments = () => {
                                     </div>
                                     <p className="text-[#132D46] font-semibold">{appointment.location}</p>
                                 </div>
+                                
                                 <div className="bg-white rounded-xl p-4 border border-[#191E29]/10">
                                     <div className="flex items-center space-x-2 text-[#696E79] font-medium mb-1">
                                         <button

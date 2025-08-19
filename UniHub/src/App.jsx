@@ -65,6 +65,7 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/courses" element={<LecturerCourses />} />
             <Route path="/notifications" element={<Notifications />} />
+           
             <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </div>
