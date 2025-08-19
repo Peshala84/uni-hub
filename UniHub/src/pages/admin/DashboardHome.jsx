@@ -98,14 +98,14 @@ const SimpleDashboard = () => {
               </div>
               <div className="flex-1 bg-[#191E29]/60 rounded-full h-3 relative overflow-hidden border border-[#132D46]/50">
                 <div 
-                  className="h-3 rounded-full transition-all duration-1000 ease-out"
+                  className="h-3 transition-all duration-1000 ease-out rounded-full"
                   style={{ 
                     width: `${maxValue > 0 ? (item.value / maxValue) * 100 : 0}%`,
                     backgroundColor: item.color
                   }}
                 />
               </div>
-              <div className="w-8 text-sm font-semibold text-white text-right">
+              <div className="w-8 text-sm font-semibold text-right text-white">
                 {item.value}
               </div>
             </div>
@@ -177,10 +177,10 @@ const SimpleDashboard = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#191E29] to-[#132D46] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-400 mb-4">
+          <div className="mb-4 text-red-400">
             <UserX size={48} className="mx-auto" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">Error Loading Data</h2>
+          <h2 className="mb-2 text-xl font-semibold text-white">Error Loading Data</h2>
           <p className="text-[#696E79] mb-4">{error}</p>
           <button 
             onClick={fetchUsers}
@@ -203,10 +203,10 @@ const SimpleDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-7xl mx-auto px-6 py-8 z-10">
+      <div className="relative z-10 px-6 py-8 mx-auto max-w-7xl">
         
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <StatCard
             title="Total Users"
             value={stats.totalUsers}
@@ -246,7 +246,7 @@ const SimpleDashboard = () => {
         </div>
 
         {/* Charts and Tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 gap-8 mb-8 lg:grid-cols-2">
           <UserChart />
           <RecentUsers />
         </div>

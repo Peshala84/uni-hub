@@ -6,6 +6,7 @@ import DashboardHome from './DashboardHome';
 import AddUser from './AddUser';
 import ViewStudents from './ViewStudents';
 import ViewLecturers from './ViewLecturers';
+import Courses from './Courses'; 
 import ComingSoon from './ComingSoon';
 import AddAnnouncements from './Anouncements';
 import axios from 'axios';
@@ -108,6 +109,8 @@ const AdminDashboard = () => {
         );
       case 'announcements':
         return <AddAnnouncements />;
+      case 'courses':
+        return <Courses />;
       default:
         return <ComingSoon />;
     }
@@ -121,14 +124,14 @@ const AdminDashboard = () => {
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <Header 
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+        <main className="flex-1 p-6 overflow-x-hidden overflow-y-auto">
           {renderContent()}
         </main>
       </div>

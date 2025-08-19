@@ -3,7 +3,7 @@ import { Plus, X, Calendar, Clock, FileText, Edit, Trash2, ChevronDown, Users, G
 
 // Move components outside to prevent recreation
 const Modal = ({ title, children, size = "2xl", onClose }) => (
-  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div className={`bg-gradient-to-b from-[#132D46] to-[#191E29] rounded-2xl border border-[#01C38D]/20 w-full max-w-${size} max-h-[90vh] overflow-y-auto shadow-2xl shadow-[#01C38D]/10`}>
       <div className="p-6 border-b border-[#01C38D]/20 flex items-center justify-between bg-gradient-to-r from-[#01C38D]/5 to-transparent">
         <h3 className="text-xl font-bold bg-gradient-to-r from-white to-[#01C38D] bg-clip-text text-transparent flex items-center">
@@ -276,7 +276,7 @@ const AnnouncementsManager = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="mx-auto space-y-6 max-w-7xl">
       {/* Header Section */}
       <div className="bg-gradient-to-br from-[#132D46]/90 to-[#191E29]/90 backdrop-blur-xl rounded-2xl border border-[#01C38D]/20 p-6 shadow-2xl shadow-[#01C38D]/10">
         <div className="flex items-center justify-between">
@@ -309,7 +309,7 @@ const AnnouncementsManager = () => {
       <div className="bg-gradient-to-br from-[#132D46]/90 to-[#191E29]/90 backdrop-blur-xl rounded-2xl border border-[#01C38D]/20 overflow-hidden shadow-2xl shadow-[#01C38D]/10">
         <div className="p-6 border-b border-[#01C38D]/20 bg-gradient-to-r from-[#01C38D]/5 to-transparent">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-white flex items-center">
+            <h3 className="flex items-center text-xl font-bold text-white">
               <Sparkles className="mr-2 text-[#01C38D]" size={20} />
               All Announcements
             </h3>
@@ -324,7 +324,7 @@ const AnnouncementsManager = () => {
               <span className="ml-3 text-white">Loading announcements...</span>
             </div>
           ) : announcements.length === 0 ? (
-            <div className="text-center py-16">
+            <div className="py-16 text-center">
               <div className="p-4 bg-[#01C38D]/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <FileText size={32} className="text-[#01C38D]" />
               </div>
@@ -342,7 +342,7 @@ const AnnouncementsManager = () => {
                     <div className="p-5">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
+                          <div className="flex items-center mb-2 space-x-3">
                             <h4 className="text-lg font-semibold text-white group-hover:text-[#01C38D] transition-colors">{announcement.topic}</h4>
                             <div className={`px-2 py-1 rounded-full text-xs font-medium ${announcement.type === 'student' ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'}`}>
                               {announcement.type === 'student' ? <GraduationCap size={12} className="inline mr-1" /> : <Users size={12} className="inline mr-1" />}
@@ -385,11 +385,11 @@ const AnnouncementsManager = () => {
                           )}
                         </div>
 
-                        <div className="flex items-center space-x-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => handleUpdateClick(announcement)} className="p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 transition-colors" title="Edit">
+                        <div className="flex items-center ml-4 space-x-2 transition-opacity opacity-0 group-hover:opacity-100">
+                          <button onClick={() => handleUpdateClick(announcement)} className="p-2 text-blue-400 transition-colors rounded-lg bg-blue-500/20 hover:bg-blue-500/30 hover:text-blue-300" title="Edit">
                             <Edit size={16} />
                           </button>
-                          <button onClick={() => { setSelectedAnnouncement(announcement); setShowModal('delete'); }} className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-colors" title="Delete">
+                          <button onClick={() => { setSelectedAnnouncement(announcement); setShowModal('delete'); }} className="p-2 text-red-400 transition-colors rounded-lg bg-red-500/20 hover:bg-red-500/30 hover:text-red-300" title="Delete">
                             <Trash2 size={16} />
                           </button>
                           <button onClick={() => toggleExpanded(announcement.id || index)} className="p-2 rounded-lg bg-[#01C38D]/20 hover:bg-[#01C38D]/30 text-[#01C38D] transition-colors" title={isExpanded ? "Collapse" : "Expand"}>
@@ -438,7 +438,7 @@ const AnnouncementsManager = () => {
               />
             </FormField>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <FormField label="Date" required>
                 <Input 
                   type="date" 
@@ -491,9 +491,9 @@ const AnnouncementsManager = () => {
                       <div key={index} className="flex items-center justify-between bg-[#191E29]/50 border border-[#01C38D]/20 rounded-lg p-3">
                         <div className="flex items-center space-x-2">
                           <FileText size={14} className="text-[#01C38D]" />
-                          <span className="text-white text-sm">{attachment}</span>
+                          <span className="text-sm text-white">{attachment}</span>
                         </div>
-                        <button onClick={() => handleRemoveAttachment(index)} disabled={loading} className="text-red-400 hover:text-red-300 transition-colors">
+                        <button onClick={() => handleRemoveAttachment(index)} disabled={loading} className="text-red-400 transition-colors hover:text-red-300">
                           <X size={16} />
                         </button>
                       </div>
@@ -503,12 +503,12 @@ const AnnouncementsManager = () => {
               </div>
             </FormField>
 
-            <div className="flex justify-end space-x-3 pt-4">
+            <div className="flex justify-end pt-4 space-x-3">
               <Button variant="secondary" onClick={closeModal} disabled={loading}>Cancel</Button>
               <Button onClick={() => handleSubmit(showModal === 'update')} disabled={loading}>
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="w-4 h-4 border-b-2 border-white rounded-full animate-spin"></div>
                     <span>{showModal === 'update' ? 'Updating...' : 'Creating...'}</span>
                   </>
                 ) : (
@@ -534,14 +534,14 @@ const AnnouncementsManager = () => {
             )}
 
             <div className="text-center">
-              <div className="p-4 bg-red-500/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <div className="flex items-center justify-center w-16 h-16 p-4 mx-auto mb-4 rounded-full bg-red-500/10">
                 <Trash2 size={32} className="text-red-500" />
               </div>
-              <p className="text-white mb-2">Are you sure you want to delete this announcement?</p>
+              <p className="mb-2 text-white">Are you sure you want to delete this announcement?</p>
               <p className="text-[#696E79] text-sm mb-4">
                 <strong>"{selectedAnnouncement.topic}"</strong>
               </p>
-              <p className="text-red-400 text-xs">This action cannot be undone.</p>
+              <p className="text-xs text-red-400">This action cannot be undone.</p>
             </div>
 
             <div className="flex justify-center space-x-3">
@@ -549,7 +549,7 @@ const AnnouncementsManager = () => {
               <Button variant="danger" onClick={handleDelete} disabled={loading}>
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="w-4 h-4 border-b-2 border-white rounded-full animate-spin"></div>
                     <span>Deleting...</span>
                   </>
                 ) : (

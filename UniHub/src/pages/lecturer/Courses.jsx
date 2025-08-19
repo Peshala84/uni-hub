@@ -1383,15 +1383,14 @@ const Courses = () => {
                               <span className="text-sm text-gray-700">
                                 {announcement.attachment}
                               </span>
-                              <button
+                              {/* <button
                                 onClick={() => {
-                                  // You can implement download functionality here
                                   console.log('Download attachment:', announcement.attachment);
                                 }}
                                 className="text-sm text-blue-600 hover:text-blue-800"
                               >
                                 Download
-                              </button>
+                              </button> */}
                             </div>
                           </div>
                         )

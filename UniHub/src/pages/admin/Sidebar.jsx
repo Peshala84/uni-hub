@@ -52,11 +52,11 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
       description: 'Faculty Overview'
     },
     { 
-      id: 'queries', 
-      label: 'Queries', 
+      id: 'courses', 
+      label: 'Courses', 
       icon: MessageSquare, 
       color: '#EF4444',
-      description: 'Support Tickets'
+      description: 'Add Courses'
     },
     { 
       id: 'announcements', 
@@ -91,7 +91,7 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
       {/* Backdrop for mobile */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -124,13 +124,13 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
 
         <div className="relative z-10 p-4 sm:p-6">
           {/* Logo Section */}
-          <div className="flex items-center space-x-3 sm:space-x-4 mb-8 sm:mb-10 group">
+          <div className="flex items-center mb-8 space-x-3 sm:space-x-4 sm:mb-10 group">
             <div className="relative">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#01C38D] to-[#01C38D]/80 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xl shadow-[#01C38D]/30 group-hover:scale-110 transition-all duration-300 overflow-hidden">
                 <img 
                   src={LOGO} 
                   alt="UniHUB Logo" 
-                  className="w-full h-full object-contain"
+                  className="object-contain w-full h-full"
                 />
               </div>
               
@@ -138,7 +138,7 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
             
             {sidebarOpen && (
               <div className="overflow-hidden">
-                <div className="animate-in slide-in-from-left duration-300">
+                <div className="duration-300 animate-in slide-in-from-left">
                   <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-[#01C38D] to-white bg-clip-text text-transparent">
                     UniHUB
                   </h2>
@@ -154,7 +154,7 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
           {sidebarOpen && (
             <div className="mb-6 sm:mb-8">
               {quickActions && (
-                <div className="mt-3 space-y-2 animate-in slide-in-from-top duration-200">
+                <div className="mt-3 space-y-2 duration-200 animate-in slide-in-from-top">
                   <button className="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-[#696E79] hover:text-[#01C38D] hover:bg-[#01C38D]/5 rounded-lg transition-all">
                     Export Data
                   </button>
@@ -246,7 +246,7 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
                   {/* Tooltip for collapsed state */}
                   {!sidebarOpen && isHovered && (
                     <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-2 bg-[#191E29] border border-[#01C38D]/20 rounded-lg shadow-2xl z-50 animate-in slide-in-from-left duration-200">
-                      <div className="text-white font-medium text-sm whitespace-nowrap">
+                      <div className="text-sm font-medium text-white whitespace-nowrap">
                         {item.label}
                       </div>
                       <div className="text-[#696E79] text-xs whitespace-nowrap">
@@ -265,11 +265,11 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
           {sidebarOpen && (
             <div className="mt-8 sm:mt-10 p-3 sm:p-4 bg-gradient-to-br from-[#01C38D]/10 to-[#132D46]/20 border border-[#01C38D]/20 rounded-xl sm:rounded-2xl">
               <div className="flex items-center space-x-2.5 sm:space-x-3">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-full w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-green-400 to-green-600">
                   <Circle size={10} className="text-white fill-current" />
                 </div>
                 <div>
-                  <p className="text-white font-medium text-xs sm:text-sm">System Status</p>
+                  <p className="text-xs font-medium text-white sm:text-sm">System Status</p>
                   <p className="text-[#01C38D] text-xs font-semibold">All Systems Online</p>
                 </div>
               </div>
